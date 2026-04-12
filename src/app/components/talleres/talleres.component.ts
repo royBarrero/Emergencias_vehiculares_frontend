@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -44,7 +44,7 @@ export class TalleresComponent implements OnInit {
     estado: ''
   };
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService , private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.cargarTalleres();
@@ -56,10 +56,12 @@ export class TalleresComponent implements OnInit {
       next: (data: any) => {
         this.talleres = data;
         this.cargando = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.error = 'Error al cargar los talleres';
         this.cargando = false;
+        this.cdr.detectChanges();
       }
     });
   }

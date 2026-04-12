@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -37,7 +37,7 @@ export class RolesComponent implements OnInit {
     id_rol: null
   };
 
-  constructor(private api: ApiService) {}
+  constructor(private api: ApiService,private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.cargarRoles();
@@ -49,10 +49,12 @@ export class RolesComponent implements OnInit {
       next: (data: any) => {
         this.roles = data;
         this.cargando = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.error = 'Error al cargar los roles';
         this.cargando = false;
+        this.cdr.detectChanges();
       }
     });
   }
