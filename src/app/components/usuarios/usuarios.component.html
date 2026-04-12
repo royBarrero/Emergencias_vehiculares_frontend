@@ -1,0 +1,126 @@
+<!-- BOTON MENU MOBILE -->
+<button class="menu-toggle" (click)="toggleMenu()">☰</button>
+<div class="overlay" [class.visible]="menuAbierto" (click)="toggleMenu()"></div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" [class.abierto]="menuAbierto">
+    <div class="sidebar-header">
+      <span class="icono">🔧</span>
+      <h2>EmergenciasVial</h2>
+    </div>
+    <nav class="menu">
+      <a routerLink="/dashboard" routerLinkActive="activo"
+        [routerLinkActiveOptions]="{exact:true}" (click)="menuAbierto=false">
+        🏠 Inicio
+      </a>
+      <a routerLink="/usuarios" routerLinkActive="activo" (click)="menuAbierto=false">
+        👥 Usuarios
+      </a>
+      <a routerLink="/talleres" routerLinkActive="activo" (click)="menuAbierto=false">
+        🔧 Talleres
+      </a>
+      <a routerLink="/tecnicos" routerLinkActive="activo" (click)="menuAbierto=false">
+        👨‍🔧 Técnicos
+      </a>
+      <a routerLink="/roles" routerLinkActive="activo" (click)="menuAbierto=false">
+        🔑 Roles
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button routerLink="/dashboard">Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO -->
+  <main class="contenido">
+    <div class="header-pagina">
+      <h1>👥 Gestión de Usuarios</h1>
+      <p>Administra los conductores registrados en la plataforma</p>
+    </div>
+
+    <!-- MENSAJES -->
+    <div class="mensaje exito" *ngIf="exito">✅ {{ exito }}</div>
+    <div class="mensaje error" *ngIf="error">❌ {{ error }}</div>
+
+    <!-- CARGANDO -->
+    <div class="cargando" *ngIf="cargando">Cargando conductores...</div>
+
+    <!-- TABLA -->
+    <div class="tabla-container" *ngIf="!cargando">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Licencia</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let conductor of conductores">
+            <td>{{ conductor.id_conductor }}</td>
+            <td>{{ conductor.nombre }}</td>
+            <td>{{ conductor.correo }}</td>
+            <td>{{ conductor.telefono || '-' }}</td>
+            <td>{{ conductor.licencia || '-' }}</td>
+            <td class="acciones">
+              <button class="btn-editar" (click)="abrirEditar(conductor)">
+                ✏️ Editar
+              </button>
+              <button class="btn-eliminar" (click)="abrirEliminar(conductor)">
+                🗑️ Eliminar
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="conductores.length === 0">
+            <td colspan="6" class="sin-datos">No hay conductores registrados</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- MODAL EDITAR -->
+    <div class="modal-overlay" *ngIf="modalEditar">
+      <div class="modal">
+        <h2>✏️ Editar Conductor</h2>
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" [(ngModel)]="formEditar.nombre" class="input-field"/>
+        </div>
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="text" [(ngModel)]="formEditar.telefono" class="input-field"/>
+        </div>
+        <div class="form-group">
+          <label>Licencia</label>
+          <input type="text" [(ngModel)]="formEditar.licencia" class="input-field"/>
+        </div>
+        <div class="form-group">
+          <label>Dirección</label>
+          <input type="text" [(ngModel)]="formEditar.direccion" class="input-field"/>
+        </div>
+        <div class="modal-botones">
+          <button class="btn-cancelar" (click)="modalEditar=false">Cancelar</button>
+          <button class="btn-guardar" (click)="guardarEdicion()">Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL ELIMINAR -->
+    <div class="modal-overlay" *ngIf="modalEliminar">
+      <div class="modal">
+        <h2>🗑️ Eliminar Conductor</h2>
+        <p>¿Estás seguro que deseas eliminar a <strong>{{ conductorAEliminar?.nombre }}</strong>?</p>
+        <p class="advertencia">⚠️ Esta acción no se puede deshacer.</p>
+        <div class="modal-botones">
+          <button class="btn-cancelar" (click)="modalEliminar=false">Cancelar</button>
+          <button class="btn-eliminar" (click)="confirmarEliminar()">Eliminar</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>

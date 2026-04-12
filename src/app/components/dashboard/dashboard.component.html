@@ -1,0 +1,68 @@
+<!-- BOTON MENU MOBILE -->
+<button class="menu-toggle" (click)="toggleMenu()">☰</button>
+
+<!-- OVERLAY -->
+<div class="overlay" [class.visible]="menuAbierto" (click)="toggleMenu()"></div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" [class.abierto]="menuAbierto">
+    <div class="sidebar-header">
+      <span class="icono">🔧</span>
+      <h2>EmergenciasVial</h2>
+    </div>
+
+    <nav class="menu">
+      <a routerLink="/dashboard" routerLinkActive="activo"
+        [routerLinkActiveOptions]="{exact:true}" (click)="menuAbierto=false">
+        🏠 Inicio
+      </a>
+      <a routerLink="/talleres" routerLinkActive="activo" (click)="menuAbierto=false">
+        🔧 Talleres
+      </a>
+      <a routerLink="/tecnicos" routerLinkActive="activo" (click)="menuAbierto=false">
+        👨‍🔧 Técnicos
+      </a>
+      <a routerLink="/roles" routerLinkActive="activo" (click)="menuAbierto=false">
+        🔑 Roles
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <p>{{ usuario?.nombre }}</p>
+      <button (click)="cerrarSesion()">Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO -->
+  <main class="contenido">
+    <div class="bienvenida">
+      <h1>Bienvenido, {{ usuario?.nombre }}! 👋</h1>
+      <p>Panel de administración de EmergenciasVial</p>
+    </div>
+    <div class="tarjeta" routerLink="/usuarios">
+        <span class="tarjeta-icono">👥</span>
+        <h3>Usuarios</h3>
+        <p>Gestionar conductores de la plataforma</p>
+    </div>
+    <div class="tarjetas">
+      <div class="tarjeta" routerLink="/talleres">
+        <span class="tarjeta-icono">🔧</span>
+        <h3>Talleres</h3>
+        <p>Gestionar talleres registrados</p>
+      </div>
+      <div class="tarjeta" routerLink="/tecnicos">
+        <span class="tarjeta-icono">👨‍🔧</span>
+        <h3>Técnicos</h3>
+        <p>Gestionar personal técnico</p>
+      </div>
+      <div class="tarjeta" routerLink="/roles">
+        <span class="tarjeta-icono">🔑</span>
+        <h3>Roles</h3>
+        <p>Gestionar roles y permisos</p>
+      </div>
+    </div>
+  </main>
+
+</div>

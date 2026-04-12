@@ -1,0 +1,39 @@
+<div class="login-container">
+  <div class="login-card">
+
+    <div class="login-header">
+      <span class="icono">🔧</span>
+      <h1>EmergenciasVial</h1>
+      <p>Panel de administración</p>
+    </div>
+
+    <div class="form-group">
+      <label>Correo electrónico</label>
+      <input
+        type="email"
+        [(ngModel)]="correo"
+        placeholder="correo@ejemplo.com"
+        class="input-field"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Contraseña</label>
+      <input
+        type="password"
+        [(ngModel)]="contrasena"
+        placeholder="••••••••"
+        class="input-field"
+      />
+    </div>
+
+    <div class="error-mensaje" *ngIf="error">
+      {{ error }}
+    </div>
+
+    <button class="btn-login" (click)="login()" [disabled]="cargando">
+      {{ cargando ? 'Iniciando sesión...' : 'Iniciar sesión' }}
+    </button>
+
+  </div>
+</div>

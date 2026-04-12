@@ -1,0 +1,141 @@
+<button class="menu-toggle" (click)="toggleMenu()">☰</button>
+<div class="overlay" [class.visible]="menuAbierto" (click)="toggleMenu()"></div>
+
+<div class="layout">
+  <aside class="sidebar" [class.abierto]="menuAbierto">
+    <div class="sidebar-header">
+      <span class="icono">🔧</span>
+      <h2>EmergenciasVial</h2>
+    </div>
+    <nav class="menu">
+      <a routerLink="/dashboard" routerLinkActive="activo"
+        [routerLinkActiveOptions]="{exact:true}" (click)="menuAbierto=false">
+        🏠 Inicio
+      </a>
+      <a routerLink="/usuarios" routerLinkActive="activo" (click)="menuAbierto=false">
+        👥 Usuarios
+      </a>
+      <a routerLink="/talleres" routerLinkActive="activo" (click)="menuAbierto=false">
+        🔧 Talleres
+      </a>
+      <a routerLink="/tecnicos" routerLinkActive="activo" (click)="menuAbierto=false">
+        👨‍🔧 Técnicos
+      </a>
+      <a routerLink="/roles" routerLinkActive="activo" (click)="menuAbierto=false">
+        🔑 Roles
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button routerLink="/login">Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <main class="contenido">
+    <div class="header-pagina">
+      <div>
+        <h1>🔑 Gestión de Roles</h1>
+        <p>Administra los roles y permisos de la plataforma</p>
+      </div>
+      <div class="header-botones">
+        <button class="btn-nuevo" (click)="abrirAsignar()">👤 Asignar Rol</button>
+        <button class="btn-nuevo" (click)="abrirRegistrar()">+ Nuevo Rol</button>
+      </div>
+    </div>
+
+    <div class="mensaje exito" *ngIf="exito">✅ {{ exito }}</div>
+    <div class="mensaje error-msg" *ngIf="error">❌ {{ error }}</div>
+
+    <div class="cargando" *ngIf="cargando">Cargando roles...</div>
+
+    <div class="tabla-container" *ngIf="!cargando">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let rol of roles">
+            <td>{{ rol.id_rol }}</td>
+            <td>
+              <span class="rol-badge">{{ rol.nombre }}</span>
+            </td>
+            <td>{{ rol.descripcion || '-' }}</td>
+            <td class="acciones">
+              <button class="btn-editar" (click)="abrirEditar(rol)">✏️ Editar</button>
+            </td>
+          </tr>
+          <tr *ngIf="roles.length === 0">
+            <td colspan="4" class="sin-datos">No hay roles registrados</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- MODAL REGISTRAR -->
+    <div class="modal-overlay" *ngIf="modalRegistrar">
+      <div class="modal">
+        <h2>🔑 Nuevo Rol</h2>
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" [(ngModel)]="formRegistrar.nombre" class="input-field"/>
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea [(ngModel)]="formRegistrar.descripcion" class="input-field" rows="3"></textarea>
+        </div>
+        <div class="modal-botones">
+          <button class="btn-cancelar" (click)="modalRegistrar=false">Cancelar</button>
+          <button class="btn-guardar" (click)="guardarRol()">Crear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL EDITAR -->
+    <div class="modal-overlay" *ngIf="modalEditar">
+      <div class="modal">
+        <h2>✏️ Editar Rol</h2>
+        <div class="form-group">
+          <label>Nombre</label>
+          <input type="text" [(ngModel)]="formEditar.nombre" class="input-field"/>
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea [(ngModel)]="formEditar.descripcion" class="input-field" rows="3"></textarea>
+        </div>
+        <div class="modal-botones">
+          <button class="btn-cancelar" (click)="modalEditar=false">Cancelar</button>
+          <button class="btn-guardar" (click)="guardarEdicion()">Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL ASIGNAR -->
+    <div class="modal-overlay" *ngIf="modalAsignar">
+      <div class="modal">
+        <h2>👤 Asignar Rol a Usuario</h2>
+        <div class="form-group">
+          <label>ID del Usuario</label>
+          <input type="number" [(ngModel)]="formAsignar.id_usuario" class="input-field"/>
+        </div>
+        <div class="form-group">
+          <label>Rol</label>
+          <select [(ngModel)]="formAsignar.id_rol" class="input-field">
+            <option [value]="null">Selecciona un rol</option>
+            <option *ngFor="let rol of roles" [value]="rol.id_rol">
+              {{ rol.nombre }}
+            </option>
+          </select>
+        </div>
+        <div class="modal-botones">
+          <button class="btn-cancelar" (click)="modalAsignar=false">Cancelar</button>
+          <button class="btn-guardar" (click)="guardarAsignacion()">Asignar</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
