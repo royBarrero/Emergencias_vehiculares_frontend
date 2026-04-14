@@ -7,7 +7,7 @@ import { environment } from '../../environments/environment';
 })
 export class ApiService {
 
- private apiUrl = 'https://emergencias-vehiculares-api.onrender.com';
+ private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
