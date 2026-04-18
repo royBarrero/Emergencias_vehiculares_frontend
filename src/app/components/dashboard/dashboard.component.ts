@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,17 +10,44 @@ import { RouterModule } from '@angular/router';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   usuario: any;
   menuAbierto: boolean = false;
+  estadisticas = {
+    talleres: 0,
+    conductores: 0,
+    tecnicos: 0,
+    roles: 0
+  };
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private api: ApiService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
+  ) {
     const data = localStorage.getItem('usuario');
     if (data) {
       this.usuario = JSON.parse(data);
     } else {
       this.router.navigate(['/login']);
     }
+  }
+
+  ngOnInit() {
+    this.cargarEstadisticas();
+  }
+
+  cargarEstadisticas() {
+    this.ngZone.run(() => {
+      this.api.obtenerEstadisticas().subscribe({
+        next: (data: any) => {
+          this.estadisticas = data;
+          this.cdr.detectChanges();
+        },
+        error: () => {}
+      });
+    });
   }
 
   toggleMenu() {

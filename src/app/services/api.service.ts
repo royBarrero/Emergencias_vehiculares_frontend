@@ -78,4 +78,8 @@ asignarRol(datos: any) {
 eliminarConductor(id: number) {
   return this.http.delete(`${this.apiUrl}/conductores/${id}`);
 }
+obtenerEstadisticas() {
+  return this.http.get(`${this.apiUrl}/estadisticas`);
 }
+}
+

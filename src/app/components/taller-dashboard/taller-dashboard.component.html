@@ -17,8 +17,17 @@
       <a [class.activo]="seccionActiva === 'inicio'" (click)="cambiarSeccion('inicio')">
         🏠 Inicio
       </a>
+      <a [class.activo]="seccionActiva === 'solicitudes'" (click)="cambiarSeccion('solicitudes')">
+        📋 Solicitudes
+      </a>
       <a [class.activo]="seccionActiva === 'tecnicos'" (click)="cambiarSeccion('tecnicos')">
         👨‍🔧 Mis Técnicos
+      </a>
+      <a [class.activo]="seccionActiva === 'historial'" (click)="cambiarSeccion('historial')">
+        📊 Historial
+      </a>
+      <a [class.activo]="seccionActiva === 'pagos'" (click)="cambiarSeccion('pagos')">
+        💰 Pagos
       </a>
       <a [class.activo]="seccionActiva === 'perfil'" (click)="cambiarSeccion('perfil')">
         ⚙️ Mi Perfil
@@ -40,22 +49,67 @@
         <p>Panel de gestión de tu taller</p>
       </div>
 
-      <div class="tarjetas">
-        <div class="tarjeta" (click)="cambiarSeccion('tecnicos')">
-          <span class="tarjeta-icono">👨‍🔧</span>
-          <h3>Mis Técnicos</h3>
-          <p>{{ tecnicos.length }} técnicos registrados</p>
+      <div class="metricas">
+        <div class="metrica-card rojo">
+          <p class="metrica-label">Técnicos</p>
+          <p class="metrica-valor">{{ tecnicos.length }}</p>
+          <p class="metrica-sub">registrados</p>
         </div>
-        <div class="tarjeta">
-          <span class="tarjeta-icono">📋</span>
-          <h3>Solicitudes</h3>
-          <p>Gestionar solicitudes de servicio</p>
+        <div class="metrica-card azul">
+          <p class="metrica-label">Solicitudes</p>
+          <p class="metrica-valor">0</p>
+          <p class="metrica-sub">pendientes</p>
         </div>
-        <div class="tarjeta" (click)="cambiarSeccion('perfil')">
-          <span class="tarjeta-icono">⚙️</span>
-          <h3>Mi Perfil</h3>
-          <p>Ver y editar información del taller</p>
+        <div class="metrica-card verde">
+          <p class="metrica-label">Atendidos</p>
+          <p class="metrica-valor">0</p>
+          <p class="metrica-sub">este mes</p>
         </div>
+        <div class="metrica-card naranja">
+          <p class="metrica-label">Calificación</p>
+          <p class="metrica-valor">⭐ {{ taller?.calificacion_promedio || '0.0' }}</p>
+          <p class="metrica-sub">promedio</p>
+        </div>
+      </div>
+
+      <div class="grid-dos">
+        <div class="card">
+          <h3>👨‍🔧 Técnicos disponibles</h3>
+          <div class="lista-tecnicos">
+            <div class="tecnico-item" *ngFor="let tecnico of tecnicos">
+              <span>{{ tecnico.nombre }}</span>
+              <span class="estado-badge" [class]="tecnico.estado_disponibilidad === 'disponible' ? 'activo' : 'pendiente'">
+                {{ tecnico.estado_disponibilidad }}
+              </span>
+            </div>
+            <div *ngIf="tecnicos.length === 0" class="sin-datos">
+              No hay técnicos registrados
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>🔧 Servicios del taller</h3>
+          <div class="servicios-lista">
+            <span class="servicio-badge" *ngFor="let servicio of taller?.servicios">
+              {{ servicio.nombre_servicio }}
+            </span>
+            <p *ngIf="!taller?.servicios?.length" class="sin-datos">
+              No hay servicios registrados
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOLICITUDES -->
+    <div *ngIf="seccionActiva === 'solicitudes'">
+      <div class="header-pagina">
+        <h1>📋 Solicitudes</h1>
+        <p>Gestión de solicitudes de emergencia</p>
+      </div>
+      <div class="card">
+        <p class="sin-datos">Módulo en desarrollo 🚧</p>
       </div>
     </div>
 
@@ -65,7 +119,6 @@
         <h1>👨‍🔧 Mis Técnicos</h1>
         <p>Personal técnico de tu taller</p>
       </div>
-
       <div class="tabla-container">
         <table class="tabla">
           <thead>
@@ -82,8 +135,7 @@
               <td>{{ tecnico.nombre }}</td>
               <td>{{ tecnico.especialidad || '-' }}</td>
               <td>
-                <span class="estado-badge"
-                  [class]="tecnico.estado_disponibilidad === 'disponible' ? 'activo' : 'pendiente'">
+                <span class="estado-badge" [class]="tecnico.estado_disponibilidad === 'disponible' ? 'activo' : 'pendiente'">
                   {{ tecnico.estado_disponibilidad }}
                 </span>
               </td>
@@ -96,13 +148,34 @@
       </div>
     </div>
 
+    <!-- HISTORIAL -->
+    <div *ngIf="seccionActiva === 'historial'">
+      <div class="header-pagina">
+        <h1>📊 Historial</h1>
+        <p>Historial de emergencias atendidas</p>
+      </div>
+      <div class="card">
+        <p class="sin-datos">Módulo en desarrollo 🚧</p>
+      </div>
+    </div>
+
+    <!-- PAGOS -->
+    <div *ngIf="seccionActiva === 'pagos'">
+      <div class="header-pagina">
+        <h1>💰 Pagos</h1>
+        <p>Historial de pagos y comisiones</p>
+      </div>
+      <div class="card">
+        <p class="sin-datos">Módulo en desarrollo 🚧</p>
+      </div>
+    </div>
+
     <!-- PERFIL -->
     <div *ngIf="seccionActiva === 'perfil'">
       <div class="header-pagina">
         <h1>⚙️ Mi Perfil</h1>
         <p>Información de tu taller</p>
       </div>
-
       <div class="perfil-card" *ngIf="taller">
         <div class="perfil-item">
           <label>Nombre del taller</label>
