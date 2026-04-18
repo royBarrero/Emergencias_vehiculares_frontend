@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -18,7 +18,6 @@ export class TecnicosComponent implements OnInit {
   error: string = '';
   exito: string = '';
   menuAbierto: boolean = false;
-
   modalRegistrar: boolean = false;
   formRegistrar = {
     nombre: '',
@@ -28,45 +27,48 @@ export class TecnicosComponent implements OnInit {
     id_taller: null,
     especialidad: ''
   };
-
   modalDisponibilidad: boolean = false;
   tecnicoSeleccionado: any = null;
   nuevoEstado: string = '';
 
-  constructor(private api: ApiService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private api: ApiService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
+  ) {}
 
   ngOnInit() {
     this.cargarDatos();
   }
 
-  cargarDatos() {
-    this.cargando = true;
-    this.api.obtenerTalleres().subscribe({
-      next: (data: any) => {
-        this.talleres = data;
-        if (this.talleres.length > 0) {
-          this.cargarTecnicos(this.talleres[0].id_taller);
-        } else {
-          this.cargando = false;
-          this.cdr.detectChanges();
-        }
-      },
-      error: () => {
-        this.error = 'Error al cargar los datos';
-        this.cargando = false;
-        this.cdr.detectChanges();
-      }
-    });
-  }
+ cargarDatos() {
+  this.cargando = true;
+  this.api.listarTodosTecnicos().subscribe({
+    next: (data: any) => {
+      this.tecnicos = data;
+      this.cargando = false;
+      this.cdr.detectChanges();
+    },
+    error: () => {
+      this.error = 'Error al cargar los técnicos';
+      this.cargando = false;
+      this.cdr.detectChanges();
+    }
+  });
+}
 
   cargarTecnicos(id_taller: number) {
     this.api.obtenerTecnicosTaller(id_taller).subscribe({
       next: (data: any) => {
-        this.tecnicos = [...this.tecnicos, ...data];
-        this.cargando = false;
+        this.ngZone.run(() => {
+          this.tecnicos = [...this.tecnicos, ...data];
+          this.cargando = false;
+          this.cdr.detectChanges();
+        });
       },
       error: () => {
         this.cargando = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -82,11 +84,13 @@ export class TecnicosComponent implements OnInit {
   guardarTecnico() {
     this.api.registrarTecnico(this.formRegistrar).subscribe({
       next: () => {
-        this.exito = 'Técnico registrado correctamente';
-        this.modalRegistrar = false;
-        this.tecnicos = [];
-        this.cargarDatos();
-        setTimeout(() => this.exito = '', 3000);
+        this.ngZone.run(() => {
+          this.exito = 'Técnico registrado correctamente';
+          this.modalRegistrar = false;
+          this.tecnicos = [];
+          this.cargarDatos();
+          setTimeout(() => this.exito = '', 3000);
+        });
       },
       error: () => {
         this.error = 'Error al registrar el técnico';
@@ -107,11 +111,13 @@ export class TecnicosComponent implements OnInit {
       { estado_disponibilidad: this.nuevoEstado }
     ).subscribe({
       next: () => {
-        this.exito = 'Disponibilidad actualizada correctamente';
-        this.modalDisponibilidad = false;
-        this.tecnicos = [];
-        this.cargarDatos();
-        setTimeout(() => this.exito = '', 3000);
+        this.ngZone.run(() => {
+          this.exito = 'Disponibilidad actualizada correctamente';
+          this.modalDisponibilidad = false;
+          this.tecnicos = [];
+          this.cargarDatos();
+          setTimeout(() => this.exito = '', 3000);
+        });
       },
       error: () => {
         this.error = 'Error al actualizar disponibilidad';

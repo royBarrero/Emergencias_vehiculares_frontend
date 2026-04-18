@@ -32,6 +32,9 @@ obtenerTaller(id: number) {
 actualizarTaller(id: number, datos: any) {
   return this.http.put(`${this.apiUrl}/talleres/${id}`, datos);
 }
+obtenerTallerPorUsuario(id_usuario: number) {
+  return this.http.get(`${this.apiUrl}/talleres/por-usuario/${id_usuario}`);
+}
   // TECNICOS
   registrarTecnico(datos: any) {
   return this.http.post(`${this.apiUrl}/tecnicos/`, datos);
@@ -46,7 +49,9 @@ actualizarTaller(id: number, datos: any) {
   cambiarDisponibilidad(id: number, datos: any) {
     return this.http.patch(`${this.apiUrl}/tecnicos/${id}/disponibilidad`, datos);
   }
-
+listarTodosTecnicos() {
+  return this.http.get(`${this.apiUrl}/tecnicos/`);
+}
   // ROLES
   obtenerRoles() {
     return this.http.get(`${this.apiUrl}/roles`);
@@ -62,6 +67,7 @@ actualizarRol(id: number, datos: any) {
 asignarRol(datos: any) {
   return this.http.post(`${this.apiUrl}/roles/asignar`, datos);
 }
+// CONDUCTORES
   actualizarConductor(id: number, datos: any) {
   return this.http.put(`${this.apiUrl}/conductores/${id}`, datos);
 }

@@ -1,39 +1,78 @@
-<div class="login-container">
-  <div class="login-card">
+<div class="split-container">
 
-    <div class="login-header">
-      <span class="icono">🔧</span>
-      <h1>EmergenciasVial</h1>
-      <p>Panel de administración</p>
+  <!-- PANEL IZQUIERDO -->
+  <div class="panel-izquierdo">
+    <div class="logo">
+      <div class="logo-icono">🔧</div>
+      <span>EmergenciasVial</span>
     </div>
 
-    <div class="form-group">
-      <label>Correo electrónico</label>
-      <input
-        type="email"
-        [(ngModel)]="correo"
-        placeholder="correo@ejemplo.com"
-        class="input-field"
-      />
+    <h1>Asistencia vehicular<br>al instante</h1>
+    <p class="descripcion">Conectamos conductores con talleres mecánicos de forma rápida, segura e inteligente.</p>
+
+    <div class="caracteristicas">
+      <div class="caracteristica">
+        <div class="icono-caracteristica">⏱️</div>
+        <span>Respuesta en minutos</span>
+      </div>
+      <div class="caracteristica">
+        <div class="icono-caracteristica">📍</div>
+        <span>Talleres cercanos a tu ubicación</span>
+      </div>
+      <div class="caracteristica">
+        <div class="icono-caracteristica">🤖</div>
+        <span>Diagnóstico inteligente con IA</span>
+      </div>
     </div>
-
-    <div class="form-group">
-      <label>Contraseña</label>
-      <input
-        type="password"
-        [(ngModel)]="contrasena"
-        placeholder="••••••••"
-        class="input-field"
-      />
-    </div>
-
-    <div class="error-mensaje" *ngIf="error">
-      {{ error }}
-    </div>
-
-    <button class="btn-login" (click)="login()" [disabled]="cargando">
-      {{ cargando ? 'Iniciando sesión...' : 'Iniciar sesión' }}
-    </button>
-
   </div>
+
+  <!-- PANEL DERECHO -->
+  <div class="panel-derecho">
+    <div class="form-container">
+      <h2>Iniciar sesión</h2>
+      <p class="subtitulo">Panel de administración</p>
+
+      <div class="form-group">
+        <label>Correo electrónico</label>
+        <input
+          type="email"
+          [(ngModel)]="correo"
+          placeholder="correo@ejemplo.com"
+          class="input-field"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Contraseña</label>
+        <div class="input-password">
+          <input
+            [type]="mostrarPassword ? 'text' : 'password'"
+            [(ngModel)]="contrasena"
+            placeholder="••••••••"
+            class="input-field"
+          />
+          <span class="ojito" (click)="togglePassword()">
+            {{ mostrarPassword ? '🙈' : '👁️' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="olvidaste">
+        <a routerLink="/recuperar">¿Olvidaste tu contraseña?</a>
+      </div>
+
+      <div class="error-mensaje" *ngIf="error">
+        {{ error }}
+      </div>
+
+      <button class="btn-login" (click)="login()" [disabled]="cargando">
+        {{ cargando ? 'Iniciando sesión...' : 'Iniciar sesión' }}
+      </button>
+
+      <p class="registro-link">
+        ¿No tienes cuenta? <a routerLink="/registro">Regístrate</a>
+      </p>
+    </div>
+  </div>
+
 </div>

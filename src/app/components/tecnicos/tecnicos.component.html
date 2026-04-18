@@ -8,8 +8,8 @@
       <h2>EmergenciasVial</h2>
     </div>
     <nav class="menu">
-      <a routerLink="/dashboard" routerLinkActive="activo"
-        [routerLinkActiveOptions]="{exact:true}" (click)="menuAbierto=false">
+      <a routerLink="/dashboard" routerLinkActive="activo" [routerLinkActiveOptions]="{exact:true}"
+        (click)="menuAbierto=false">
         🏠 Inicio
       </a>
       <a routerLink="/usuarios" routerLinkActive="activo" (click)="menuAbierto=false">
@@ -36,7 +36,6 @@
         <h1>👨‍🔧 Gestión de Técnicos</h1>
         <p>Administra el personal técnico de los talleres</p>
       </div>
-      <button class="btn-nuevo" (click)="abrirRegistrar()">+ Nuevo Técnico</button>
     </div>
 
     <div class="mensaje exito" *ngIf="exito">✅ {{ exito }}</div>
@@ -52,8 +51,8 @@
             <th>Nombre</th>
             <th>Correo</th>
             <th>Especialidad</th>
+            <th>Taller</th>
             <th>Disponibilidad</th>
-            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -62,16 +61,14 @@
             <td>{{ tecnico.nombre }}</td>
             <td>{{ tecnico.correo }}</td>
             <td>{{ tecnico.especialidad || '-' }}</td>
+           {{ tecnico.nombre_taller }}
             <td>
-              <span [class]="getDisponibilidadClass(tecnico.estado_disponibilidad)"
-                class="estado-badge">
+              <span [class]="getDisponibilidadClass(tecnico.estado_disponibilidad)" class="estado-badge">
                 {{ tecnico.estado_disponibilidad }}
               </span>
             </td>
             <td class="acciones">
-              <button class="btn-editar" (click)="abrirDisponibilidad(tecnico)">
-                🔄 Disponibilidad
-              </button>
+             
             </td>
           </tr>
           <tr *ngIf="tecnicos.length === 0">
@@ -80,68 +77,5 @@
         </tbody>
       </table>
     </div>
-
-    <!-- MODAL REGISTRAR -->
-    <div class="modal-overlay" *ngIf="modalRegistrar">
-      <div class="modal">
-        <h2>👨‍🔧 Nuevo Técnico</h2>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" [(ngModel)]="formRegistrar.nombre" class="input-field"/>
-          </div>
-          <div class="form-group">
-            <label>Correo</label>
-            <input type="email" [(ngModel)]="formRegistrar.correo" class="input-field"/>
-          </div>
-          <div class="form-group">
-            <label>Contraseña</label>
-            <input type="password" [(ngModel)]="formRegistrar.contrasena" class="input-field"/>
-          </div>
-          <div class="form-group">
-            <label>Teléfono</label>
-            <input type="text" [(ngModel)]="formRegistrar.telefono" class="input-field"/>
-          </div>
-          <div class="form-group">
-            <label>Especialidad</label>
-            <input type="text" [(ngModel)]="formRegistrar.especialidad" class="input-field"/>
-          </div>
-          <div class="form-group">
-            <label>Taller</label>
-            <select [(ngModel)]="formRegistrar.id_taller" class="input-field">
-              <option [value]="null">Selecciona un taller</option>
-              <option *ngFor="let taller of talleres" [value]="taller.id_taller">
-                {{ taller.nombre_taller }}
-              </option>
-            </select>
-          </div>
-        </div>
-        <div class="modal-botones">
-          <button class="btn-cancelar" (click)="modalRegistrar=false">Cancelar</button>
-          <button class="btn-guardar" (click)="guardarTecnico()">Registrar</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- MODAL DISPONIBILIDAD -->
-    <div class="modal-overlay" *ngIf="modalDisponibilidad">
-      <div class="modal">
-        <h2>🔄 Cambiar Disponibilidad</h2>
-        <p>Técnico: <strong>{{ tecnicoSeleccionado?.nombre }}</strong></p>
-        <div class="form-group" style="margin-top: 16px;">
-          <label>Estado</label>
-          <select [(ngModel)]="nuevoEstado" class="input-field">
-            <option value="disponible">Disponible</option>
-            <option value="ocupado">Ocupado</option>
-            <option value="inactivo">Inactivo</option>
-          </select>
-        </div>
-        <div class="modal-botones">
-          <button class="btn-cancelar" (click)="modalDisponibilidad=false">Cancelar</button>
-          <button class="btn-guardar" (click)="guardarDisponibilidad()">Guardar</button>
-        </div>
-      </div>
-    </div>
-
   </main>
 </div>

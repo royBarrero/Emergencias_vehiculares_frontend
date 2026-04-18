@@ -1,0 +1,135 @@
+<button class="menu-toggle" (click)="toggleMenu()">☰</button>
+<div class="overlay" [class.visible]="menuAbierto" (click)="toggleMenu()"></div>
+
+<div class="layout">
+  <aside class="sidebar" [class.abierto]="menuAbierto">
+    <div class="sidebar-header">
+      <div class="sidebar-icono">🔧</div>
+      <div>
+        <h2>{{ taller?.nombre_taller || 'Mi Taller' }}</h2>
+        <span class="estado-badge" [class]="taller?.estado === 'activo' ? 'activo' : 'pendiente'">
+          {{ taller?.estado || 'pendiente' }}
+        </span>
+      </div>
+    </div>
+
+    <nav class="menu">
+      <a [class.activo]="seccionActiva === 'inicio'" (click)="cambiarSeccion('inicio')">
+        🏠 Inicio
+      </a>
+      <a [class.activo]="seccionActiva === 'tecnicos'" (click)="cambiarSeccion('tecnicos')">
+        👨‍🔧 Mis Técnicos
+      </a>
+      <a [class.activo]="seccionActiva === 'perfil'" (click)="cambiarSeccion('perfil')">
+        ⚙️ Mi Perfil
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <p>{{ usuario?.nombre }}</p>
+      <button (click)="cerrarSesion()">Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <main class="contenido">
+
+    <!-- INICIO -->
+    <div *ngIf="seccionActiva === 'inicio'">
+      <div class="header-pagina">
+        <h1>🏠 Bienvenido, {{ usuario?.nombre }}!</h1>
+        <p>Panel de gestión de tu taller</p>
+      </div>
+
+      <div class="tarjetas">
+        <div class="tarjeta" (click)="cambiarSeccion('tecnicos')">
+          <span class="tarjeta-icono">👨‍🔧</span>
+          <h3>Mis Técnicos</h3>
+          <p>{{ tecnicos.length }} técnicos registrados</p>
+        </div>
+        <div class="tarjeta">
+          <span class="tarjeta-icono">📋</span>
+          <h3>Solicitudes</h3>
+          <p>Gestionar solicitudes de servicio</p>
+        </div>
+        <div class="tarjeta" (click)="cambiarSeccion('perfil')">
+          <span class="tarjeta-icono">⚙️</span>
+          <h3>Mi Perfil</h3>
+          <p>Ver y editar información del taller</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TECNICOS -->
+    <div *ngIf="seccionActiva === 'tecnicos'">
+      <div class="header-pagina">
+        <h1>👨‍🔧 Mis Técnicos</h1>
+        <p>Personal técnico de tu taller</p>
+      </div>
+
+      <div class="tabla-container">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nombre</th>
+              <th>Especialidad</th>
+              <th>Disponibilidad</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let tecnico of tecnicos">
+              <td>{{ tecnico.id_tecnico }}</td>
+              <td>{{ tecnico.nombre }}</td>
+              <td>{{ tecnico.especialidad || '-' }}</td>
+              <td>
+                <span class="estado-badge"
+                  [class]="tecnico.estado_disponibilidad === 'disponible' ? 'activo' : 'pendiente'">
+                  {{ tecnico.estado_disponibilidad }}
+                </span>
+              </td>
+            </tr>
+            <tr *ngIf="tecnicos.length === 0">
+              <td colspan="4" class="sin-datos">No hay técnicos registrados</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PERFIL -->
+    <div *ngIf="seccionActiva === 'perfil'">
+      <div class="header-pagina">
+        <h1>⚙️ Mi Perfil</h1>
+        <p>Información de tu taller</p>
+      </div>
+
+      <div class="perfil-card" *ngIf="taller">
+        <div class="perfil-item">
+          <label>Nombre del taller</label>
+          <p>{{ taller.nombre_taller }}</p>
+        </div>
+        <div class="perfil-item">
+          <label>Correo</label>
+          <p>{{ taller.correo }}</p>
+        </div>
+        <div class="perfil-item">
+          <label>Teléfono</label>
+          <p>{{ taller.telefono || '-' }}</p>
+        </div>
+        <div class="perfil-item">
+          <label>Dirección</label>
+          <p>{{ taller.direccion || '-' }}</p>
+        </div>
+        <div class="perfil-item">
+          <label>Descripción</label>
+          <p>{{ taller.descripcion || '-' }}</p>
+        </div>
+        <div class="perfil-item">
+          <label>Calificación</label>
+          <p>⭐ {{ taller.calificacion_promedio }}</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
