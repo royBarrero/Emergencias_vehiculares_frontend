@@ -78,4 +78,29 @@ asignarRol(datos: any) {
 eliminarConductor(id: number) {
   return this.http.delete(`${this.apiUrl}/conductores/${id}`);
 }
+obtenerEstadisticas() {
+  return this.http.get(`${this.apiUrl}/estadisticas`);
 }
+// EMERGENCIAS
+getAuthHeaders() {
+  const token = localStorage.getItem('token');
+  return { headers: { Authorization: `Bearer ${token}` } };
+}
+
+obtenerEmergenciasPendientes() {
+  return this.http.get(`${this.apiUrl}/emergencias/pendientes`, this.getAuthHeaders());
+}
+
+obtenerEmergenciasTaller(id_taller: number) {
+  return this.http.get(`${this.apiUrl}/emergencias/taller/${id_taller}`, this.getAuthHeaders());
+}
+
+obtenerEmergencia(id: number) {
+  return this.http.get(`${this.apiUrl}/emergencias/${id}`, this.getAuthHeaders());
+}
+
+actualizarEstadoEmergencia(id: number, datos: any) {
+  return this.http.patch(`${this.apiUrl}/emergencias/${id}`, datos, this.getAuthHeaders());
+}
+}
+

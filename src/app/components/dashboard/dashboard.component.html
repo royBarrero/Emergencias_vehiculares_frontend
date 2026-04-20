@@ -1,22 +1,23 @@
-<!-- BOTON MENU MOBILE -->
 <button class="menu-toggle" (click)="toggleMenu()">☰</button>
-
-<!-- OVERLAY -->
 <div class="overlay" [class.visible]="menuAbierto" (click)="toggleMenu()"></div>
 
 <div class="layout">
-
-  <!-- SIDEBAR -->
   <aside class="sidebar" [class.abierto]="menuAbierto">
     <div class="sidebar-header">
-      <span class="icono">🔧</span>
-      <h2>EmergenciasVial</h2>
+      <div class="sidebar-icono">🔧</div>
+      <div>
+        <h2>EmergenciasVial</h2>
+        <p class="sidebar-subtitulo">Panel Admin</p>
+      </div>
     </div>
 
     <nav class="menu">
       <a routerLink="/dashboard" routerLinkActive="activo"
         [routerLinkActiveOptions]="{exact:true}" (click)="menuAbierto=false">
         🏠 Inicio
+      </a>
+      <a routerLink="/usuarios" routerLinkActive="activo" (click)="menuAbierto=false">
+        👥 Usuarios
       </a>
       <a routerLink="/talleres" routerLinkActive="activo" (click)="menuAbierto=false">
         🔧 Talleres
@@ -27,6 +28,10 @@
       <a routerLink="/roles" routerLinkActive="activo" (click)="menuAbierto=false">
         🔑 Roles
       </a>
+      <a class="pronto">
+        📋 Bitácora
+        <span class="badge-pronto">pronto</span>
+      </a>
     </nav>
 
     <div class="sidebar-footer">
@@ -35,34 +40,56 @@
     </div>
   </aside>
 
-  <!-- CONTENIDO -->
   <main class="contenido">
-    <div class="bienvenida">
-      <h1>Bienvenido, {{ usuario?.nombre }}! 👋</h1>
+    <div class="header-pagina">
+      <h1>🏠 Bienvenido, {{ usuario?.nombre }}!</h1>
       <p>Panel de administración de EmergenciasVial</p>
     </div>
-    <div class="tarjeta" routerLink="/usuarios">
+
+    <div class="metricas">
+      <div class="metrica-card rojo">
+        <p class="metrica-label">Talleres</p>
+        <p class="metrica-valor">{{ estadisticas.talleres }}</p>
+        <p class="metrica-sub">registrados</p>
+      </div>
+      <div class="metrica-card azul">
+        <p class="metrica-label">Conductores</p>
+        <p class="metrica-valor">{{ estadisticas.conductores }}</p>
+        <p class="metrica-sub">registrados</p>
+      </div>
+      <div class="metrica-card verde">
+        <p class="metrica-label">Técnicos</p>
+        <p class="metrica-valor">{{ estadisticas.tecnicos }}</p>
+        <p class="metrica-sub">registrados</p>
+      </div>
+      <div class="metrica-card naranja">
+        <p class="metrica-label">Roles</p>
+        <p class="metrica-valor">{{ estadisticas.roles }}</p>
+        <p class="metrica-sub">definidos</p>
+      </div>
+    </div>
+
+    <div class="tarjetas">
+      <div class="tarjeta" routerLink="/usuarios">
         <span class="tarjeta-icono">👥</span>
         <h3>Usuarios</h3>
-        <p>Gestionar conductores de la plataforma</p>
-    </div>
-    <div class="tarjetas">
+        <p>Gestionar conductores</p>
+      </div>
       <div class="tarjeta" routerLink="/talleres">
         <span class="tarjeta-icono">🔧</span>
         <h3>Talleres</h3>
-        <p>Gestionar talleres registrados</p>
+        <p>Gestionar talleres</p>
       </div>
       <div class="tarjeta" routerLink="/tecnicos">
         <span class="tarjeta-icono">👨‍🔧</span>
         <h3>Técnicos</h3>
-        <p>Gestionar personal técnico</p>
+        <p>Ver personal técnico</p>
       </div>
       <div class="tarjeta" routerLink="/roles">
         <span class="tarjeta-icono">🔑</span>
         <h3>Roles</h3>
-        <p>Gestionar roles y permisos</p>
+        <p>Gestionar permisos</p>
       </div>
     </div>
   </main>
-
 </div>
