@@ -1,0 +1,173 @@
+<div class="emergencias-container">
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button [class.activo]="tabActiva === 'pendientes'" (click)="cambiarTab('pendientes')">
+      Emergencias pendientes
+      <span class="badge" *ngIf="emergenciasPendientes.length > 0">{{ emergenciasPendientes.length }}</span>
+    </button>
+    <button [class.activo]="tabActiva === 'mis-emergencias'" (click)="cambiarTab('mis-emergencias')">
+      Mis emergencias
+      <span class="badge badge-gris" *ngIf="emergenciasTaller.length > 0">{{ emergenciasTaller.length }}</span>
+    </button>
+  </div>
+
+  <div class="contenido">
+
+    <!-- LISTA -->
+    <div class="lista-panel">
+
+      <div *ngIf="cargando" class="cargando">
+        <div class="spinner"></div>
+        <p>Cargando emergencias...</p>
+      </div>
+
+      <!-- Pendientes -->
+      <ng-container *ngIf="tabActiva === 'pendientes' && !cargando">
+        <div *ngIf="emergenciasPendientes.length === 0" class="vacio">
+          <span class="vacio-icono">✓</span>
+          <p>No hay emergencias pendientes</p>
+        </div>
+        <div
+          *ngFor="let e of emergenciasPendientes"
+          class="emergencia-card"
+          [class.seleccionada]="emergenciaSeleccionada?.id_emergencia === e.id_emergencia"
+          (click)="verDetalle(e)">
+          <div class="card-header">
+            <span class="tipo">{{ e.tipo_incidente }}</span>
+            <span class="prioridad-badge" [style.background]="getColorPrioridad(e.prioridad) + '20'" [style.color]="getColorPrioridad(e.prioridad)">
+              {{ e.prioridad }}
+            </span>
+          </div>
+          <div class="card-body">
+            <p class="direccion">📍 {{ e.direccion_aproximada || 'Sin dirección' }}</p>
+            <p class="fecha">{{ e.created_at | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+          <div class="estado-badge" [style.background]="getColorEstado(e.estado) + '20'" [style.color]="getColorEstado(e.estado)">
+            {{ e.estado }}
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Mis emergencias -->
+      <ng-container *ngIf="tabActiva === 'mis-emergencias' && !cargando">
+        <div *ngIf="emergenciasTaller.length === 0" class="vacio">
+          <span class="vacio-icono">📋</span>
+          <p>No tienes emergencias asignadas</p>
+        </div>
+        <div
+          *ngFor="let e of emergenciasTaller"
+          class="emergencia-card"
+          [class.seleccionada]="emergenciaSeleccionada?.id_emergencia === e.id_emergencia"
+          (click)="verDetalle(e)">
+          <div class="card-header">
+            <span class="tipo">{{ e.tipo_incidente }}</span>
+            <span class="prioridad-badge" [style.background]="getColorPrioridad(e.prioridad) + '20'" [style.color]="getColorPrioridad(e.prioridad)">
+              {{ e.prioridad }}
+            </span>
+          </div>
+          <div class="card-body">
+            <p class="direccion">📍 {{ e.direccion_aproximada || 'Sin dirección' }}</p>
+            <p class="fecha">{{ e.created_at | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+          <div class="estado-badge" [style.background]="getColorEstado(e.estado) + '20'" [style.color]="getColorEstado(e.estado)">
+            {{ e.estado }}
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+
+    <!-- DETALLE -->
+    <div class="detalle-panel" *ngIf="emergenciaSeleccionada; else sinSeleccion">
+      <div class="detalle-header">
+        <h3>Emergencia #{{ emergenciaSeleccionada.id_emergencia }}</h3>
+        <button class="btn-cerrar" (click)="cerrarDetalle()">✕</button>
+      </div>
+
+      <div class="detalle-body">
+
+        <div class="info-row">
+          <span class="label">Tipo</span>
+          <span class="valor">{{ emergenciaSeleccionada.tipo_incidente }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Prioridad</span>
+          <span class="valor prioridad" [style.color]="getColorPrioridad(emergenciaSeleccionada.prioridad)">
+            {{ emergenciaSeleccionada.prioridad | uppercase }}
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="label">Estado</span>
+          <span class="valor estado" [style.color]="getColorEstado(emergenciaSeleccionada.estado)">
+            {{ emergenciaSeleccionada.estado }}
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="label">Ubicación</span>
+          <span class="valor">{{ emergenciaSeleccionada.direccion_aproximada || 'Sin dirección' }}</span>
+        </div>
+        <div class="info-row" *ngIf="emergenciaSeleccionada.descripcion">
+          <span class="label">Descripción</span>
+          <span class="valor">{{ emergenciaSeleccionada.descripcion }}</span>
+        </div>
+        <div class="info-row" *ngIf="emergenciaSeleccionada.transcripcion_audio">
+          <span class="label">Audio IA</span>
+          <span class="valor transcripcion">{{ emergenciaSeleccionada.transcripcion_audio }}</span>
+        </div>
+
+        <!-- Acciones según estado -->
+        <div class="acciones">
+
+          <!-- Pendiente: aceptar o rechazar -->
+          <ng-container *ngIf="emergenciaSeleccionada.estado === 'pendiente'">
+            <button class="btn-aceptar" (click)="aceptarEmergencia()">✓ Aceptar emergencia</button>
+            <button class="btn-rechazar" (click)="rechazarEmergencia()">✕ Rechazar</button>
+          </ng-container>
+
+          <!-- Asignada: asignar técnico -->
+          <ng-container *ngIf="emergenciaSeleccionada.estado === 'asignada'">
+            <p class="seccion-label">Asignar técnico</p>
+            <select [(ngModel)]="idTecnicoSeleccionado" class="select-tecnico">
+              <option [ngValue]="null">Seleccionar técnico...</option>
+              <option *ngFor="let t of tecnicos" [value]="t.id_tecnico">
+                {{ t.nombre }} — {{ t.especialidad }}
+              </option>
+            </select>
+            <button class="btn-aceptar" (click)="asignarTecnico()" [disabled]="!idTecnicoSeleccionado">
+              Despachar técnico
+            </button>
+          </ng-container>
+
+          <!-- En camino: marcar atendiendo -->
+          <ng-container *ngIf="emergenciaSeleccionada.estado === 'en_camino'">
+            <button class="btn-estado" (click)="actualizarEstado('atendiendo')">
+              🔧 Marcar como atendiendo
+            </button>
+          </ng-container>
+
+          <!-- Atendiendo: finalizar -->
+          <ng-container *ngIf="emergenciaSeleccionada.estado === 'atendiendo'">
+            <button class="btn-aceptar" (click)="actualizarEstado('finalizada')">
+              ✓ Marcar como finalizada
+            </button>
+          </ng-container>
+
+          <!-- Finalizada -->
+          <ng-container *ngIf="emergenciaSeleccionada.estado === 'finalizada'">
+            <div class="finalizada-msg">✓ Servicio completado</div>
+          </ng-container>
+
+        </div>
+      </div>
+    </div>
+
+    <ng-template #sinSeleccion>
+      <div class="detalle-vacio">
+        <span>👈</span>
+        <p>Selecciona una emergencia para ver el detalle</p>
+      </div>
+    </ng-template>
+
+  </div>
+</div>

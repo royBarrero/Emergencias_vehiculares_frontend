@@ -78,7 +78,8 @@
           <div class="lista-tecnicos">
             <div class="tecnico-item" *ngFor="let tecnico of tecnicos">
               <span>{{ tecnico.nombre }}</span>
-              <span class="estado-badge" [class]="tecnico.estado_disponibilidad === 'disponible' ? 'activo' : 'pendiente'">
+              <span class="estado-badge"
+                [class]="tecnico.estado_disponibilidad === 'disponible' ? 'activo' : 'pendiente'">
                 {{ tecnico.estado_disponibilidad }}
               </span>
             </div>
@@ -104,13 +105,7 @@
 
     <!-- SOLICITUDES -->
     <div *ngIf="seccionActiva === 'solicitudes'">
-      <div class="header-pagina">
-        <h1>📋 Solicitudes</h1>
-        <p>Gestión de solicitudes de emergencia</p>
-      </div>
-      <div class="card">
-        <p class="sin-datos">Módulo en desarrollo 🚧</p>
-      </div>
+      <app-emergencias-taller></app-emergencias-taller>
     </div>
 
     <!-- TECNICOS -->
@@ -135,7 +130,8 @@
               <td>{{ tecnico.nombre }}</td>
               <td>{{ tecnico.especialidad || '-' }}</td>
               <td>
-                <span class="estado-badge" [class]="tecnico.estado_disponibilidad === 'disponible' ? 'activo' : 'pendiente'">
+                <span class="estado-badge"
+                  [class]="tecnico.estado_disponibilidad === 'disponible' ? 'activo' : 'pendiente'">
                   {{ tecnico.estado_disponibilidad }}
                 </span>
               </td>

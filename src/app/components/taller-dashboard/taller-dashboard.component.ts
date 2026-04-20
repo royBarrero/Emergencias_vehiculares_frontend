@@ -3,13 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
+import { EmergenciasTallerComponent } from '../emergencias/emergencias-taller.component';
 
 @Component({
   selector: 'app-taller-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule,EmergenciasTallerComponent],
   templateUrl: './taller-dashboard.component.html',
   styleUrl: './taller-dashboard.component.css'
+  
 })
 export class TallerDashboardComponent implements OnInit {
   usuario: any;
