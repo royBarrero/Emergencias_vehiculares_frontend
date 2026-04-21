@@ -63,7 +63,6 @@ cargarDatos() {
       error: () => {}
     });
   }
- 
   cerrarSesion() {
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');
