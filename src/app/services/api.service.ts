@@ -83,10 +83,11 @@ obtenerEstadisticas() {
 }
 // EMERGENCIAS
 getAuthHeaders() {
+  const usuario = localStorage.getItem('usuario');
   const token = localStorage.getItem('token');
+  console.log('TOKEN ANGULAR:', token); // agregar para debug
   return { headers: { Authorization: `Bearer ${token}` } };
 }
-
 obtenerEmergenciasPendientes() {
   return this.http.get(`${this.apiUrl}/emergencias/pendientes`, this.getAuthHeaders());
 }
