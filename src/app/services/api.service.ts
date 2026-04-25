@@ -52,6 +52,9 @@ obtenerTallerPorUsuario(id_usuario: number) {
 listarTodosTecnicos() {
   return this.http.get(`${this.apiUrl}/tecnicos/`);
 }
+eliminarTecnico(id: number) {
+  return this.http.delete(`${this.apiUrl}/tecnicos/${id}`);
+}
   // ROLES
   obtenerRoles() {
     return this.http.get(`${this.apiUrl}/roles`);

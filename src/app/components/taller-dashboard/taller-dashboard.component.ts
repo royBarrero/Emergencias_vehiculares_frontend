@@ -19,6 +19,21 @@ export class TallerDashboardComponent implements OnInit {
   tecnicos: any[] = [];
   menuAbierto: boolean = false;
   seccionActiva: string = 'inicio';
+  solicitudesPendientes: number = 0;
+  serviciosAtendidos: number = 0;
+  modalTecnicoAbierto: boolean = false;
+  historial: any[] = [];
+historialCargando: boolean = false;
+tecnicoEditando: any = null;
+formTecnico: any = {
+  nombre: '',
+  correo: '',
+  contrasena: '',
+  telefono: '',
+  especialidad: '',
+  estado_disponibilidad: 'disponible'
+  
+};
 
   constructor(
     private api: ApiService,
@@ -45,6 +60,7 @@ cargarDatos() {
         this.taller = data;
         this.cargarTecnicos(this.taller.id_taller);
         this.cdr.detectChanges();
+        this.cargarEstadisticasEmergencias(this.taller.id_taller);
       },
       error: () => {
         console.error('Error al cargar el taller');
@@ -74,7 +90,152 @@ cargarDatos() {
   }
 
   cambiarSeccion(seccion: string) {
-    this.seccionActiva = seccion;
-    this.menuAbierto = false;
+  this.seccionActiva = seccion;
+  this.menuAbierto = false;
+  if (seccion === 'historial') {
+    this.cargarHistorial();
   }
+}
+  cargarEstadisticasEmergencias(id_taller: number) {
+  // Emergencias asignadas al taller (finalizadas)
+  this.api.obtenerEmergenciasTaller(id_taller).subscribe({
+    next: (data: any) => {
+      this.ngZone.run(() => {
+        this.serviciosAtendidos = data.filter((e: any) => e.estado === 'finalizada').length;
+        this.cdr.detectChanges();
+      });
+    }
+  });
+
+  // Emergencias pendientes globales
+  this.api.obtenerEmergenciasPendientes().subscribe({
+    next: (data: any) => {
+      this.ngZone.run(() => {
+        this.solicitudesPendientes = data.length;
+        this.cdr.detectChanges();
+      });
+    }
+  });
+}
+abrirModalTecnico() {
+  this.tecnicoEditando = null;
+  this.formTecnico = {
+    nombre: '',
+    correo: '',
+    contrasena: '',
+    telefono: '',
+    especialidad: '',
+    estado_disponibilidad: 'disponible'
+  };
+  this.modalTecnicoAbierto = true;
+}
+
+editarTecnico(tecnico: any) {
+  this.tecnicoEditando = tecnico;
+  this.formTecnico = {
+    nombre: tecnico.nombre,
+    correo: tecnico.correo,
+    telefono: tecnico.telefono || '',
+    especialidad: tecnico.especialidad || '',
+    contrasena: '',
+    estado_disponibilidad: tecnico.estado_disponibilidad
+  };
+  this.modalTecnicoAbierto = true;
+}
+
+cerrarModalTecnico() {
+  this.modalTecnicoAbierto = false;
+  this.tecnicoEditando = null;
+}
+
+guardarTecnico() {
+  if (!this.formTecnico.nombre || !this.formTecnico.correo) {
+    alert('Nombre y correo son obligatorios');
+    return;
+  }
+
+  if (this.tecnicoEditando) {
+    const datos: any = {
+      nombre: this.formTecnico.nombre,
+      telefono: this.formTecnico.telefono,
+      especialidad: this.formTecnico.especialidad,
+    };
+
+    this.api.actualizarTecnico(this.tecnicoEditando.id_tecnico, datos).subscribe({
+      next: () => {
+        // Si cambió disponibilidad la actualizamos por separado
+        if (this.formTecnico.estado_disponibilidad !== this.tecnicoEditando.estado_disponibilidad) {
+          this.api.cambiarDisponibilidad(this.tecnicoEditando.id_tecnico, {
+            estado_disponibilidad: this.formTecnico.estado_disponibilidad
+          }).subscribe({
+            next: () => {
+              this.ngZone.run(() => {
+                this.cerrarModalTecnico();
+                this.cargarTecnicos(this.taller.id_taller);
+                this.cdr.detectChanges();
+              });
+            }
+          });
+        } else {
+          this.ngZone.run(() => {
+            this.cerrarModalTecnico();
+            this.cargarTecnicos(this.taller.id_taller);
+            this.cdr.detectChanges();
+          });
+        }
+      },
+      error: () => alert('Error al actualizar el técnico')
+    });
+  } else {
+    const datos = {
+      nombre: this.formTecnico.nombre,
+      correo: this.formTecnico.correo,
+      contrasena: this.formTecnico.contrasena,
+      telefono: this.formTecnico.telefono,
+      especialidad: this.formTecnico.especialidad,
+      id_taller: this.taller.id_taller,
+      estado_disponibilidad: 'disponible'
+    };
+    this.api.registrarTecnico(datos).subscribe({
+      next: () => {
+        this.ngZone.run(() => {
+          this.cerrarModalTecnico();
+          this.cargarTecnicos(this.taller.id_taller);
+          this.cdr.detectChanges();
+        });
+      },
+      error: () => alert('Error al registrar el técnico')
+    });
+  }
+}
+
+eliminarTecnico(id: number) {
+  if (!confirm('¿Estás seguro de eliminar este técnico?')) return;
+  this.api.eliminarTecnico(id).subscribe({
+    next: () => {
+      this.ngZone.run(() => {
+        this.cargarTecnicos(this.taller.id_taller);
+        this.cdr.detectChanges();
+      });
+    },
+    error: () => alert('Error al eliminar el técnico')
+  });
+}
+cargarHistorial() {
+  this.historialCargando = true;
+  this.api.obtenerEmergenciasTaller(this.taller.id_taller).subscribe({
+    next: (data: any) => {
+      this.ngZone.run(() => {
+        this.historial = data.filter((e: any) => e.estado === 'finalizada');
+        this.historialCargando = false;
+        this.cdr.detectChanges();
+      });
+    },
+    error: () => { this.historialCargando = false; }
+  });
+}
+getColorPrioridad(prioridad: string): string {
+  const colores: any = { baja: '#4CAF50', media: '#FF9800', alta: '#E53935' };
+  return colores[prioridad] || '#999';
+}
 }

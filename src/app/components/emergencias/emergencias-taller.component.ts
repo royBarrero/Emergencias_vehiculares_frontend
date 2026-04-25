@@ -183,4 +183,14 @@ export class EmergenciasTallerComponent implements OnInit {
     };
     return colores[estado] || '#999';
   }
+  abrirFoto(url: string) {
+  window.open(url, '_blank');
+}
+
+abrirMapa() {
+  if (!this.emergenciaSeleccionada) return;
+  const lat = this.emergenciaSeleccionada.latitud;
+  const lng = this.emergenciaSeleccionada.longitud;
+  window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
+}
 }
