@@ -32,7 +32,6 @@ formTecnico: any = {
   telefono: '',
   especialidad: '',
   estado_disponibilidad: 'disponible'
-  
 };
 servicios: any[] = [];
 serviciosPredefinidos = [

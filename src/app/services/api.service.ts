@@ -118,5 +118,8 @@ agregarServicio(id_taller: number, datos: any) {
 eliminarServicio(id_taller: number, id_servicio: number) {
   return this.http.delete(`${this.apiUrl}/talleres/${id_taller}/servicios/${id_servicio}`);
 }
+obtenerTalleresCercanos(id_emergencia: number) {
+  return this.http.get(`${this.apiUrl}/talleres/cercanos/${id_emergencia}`);
+}
 }
 
