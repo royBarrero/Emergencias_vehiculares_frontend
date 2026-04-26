@@ -1,8 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef , AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ApiService } from '../../services/api.service';
+import * as L from 'leaflet';
+
 
 @Component({
   selector: 'app-talleres',
@@ -17,6 +19,9 @@ export class TalleresComponent implements OnInit {
   error: string = '';
   exito: string = '';
   menuAbierto: boolean = false;
+  mapa: any = null;
+  marcador: any = null;
+  mapaInicializado: boolean = false;
 
   // Modal registrar
   modalRegistrar: boolean = false;
@@ -31,8 +36,20 @@ export class TalleresComponent implements OnInit {
     longitud: null,
     descripcion: '',
     servicios: [] as any[]
+    
   };
-
+serviciosPredefinidos = [
+  'Mecánica general',
+  'Chaperio y pintura',
+  'Electricidad automotriz',
+  'Llantas y alineación',
+  'Frenos',
+  'Transmisión y caja',
+  'Motor',
+  'Aire acondicionado',
+  'Soldadura',
+  'Grúa y remolque'
+];
   // Modal editar
   modalEditar: boolean = false;
   tallerSeleccionado: any = null;
@@ -67,14 +84,8 @@ export class TalleresComponent implements OnInit {
   }
 
   abrirRegistrar() {
-    this.formRegistrar = {
-      nombre: '', correo: '', contrasena: '',
-      telefono: '', nombre_taller: '', direccion: '',
-      latitud: null, longitud: null, descripcion: '',
-      servicios: []
-    };
-    this.modalRegistrar = true;
-  }
+  this.abrirRegistrarConMapa();
+}
 
   guardarTaller() {
     this.api.registrarTaller(this.formRegistrar).subscribe({
@@ -132,4 +143,66 @@ export class TalleresComponent implements OnInit {
       default: return 'estado-pendiente';
     }
   }
+  inicializarMapa() {
+  setTimeout(() => {
+    if (this.mapa) {
+      this.mapa.remove();
+      this.mapa = null;
+    }
+
+    this.mapa = L.map('mapa-registro').setView([-17.7834, -63.1821], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(this.mapa);
+
+    this.mapa.on('click', (e: any) => {
+      const { lat, lng } = e.latlng;
+
+      if (this.marcador) {
+        this.marcador.setLatLng([lat, lng]);
+      } else {
+        this.marcador = L.marker([lat, lng]).addTo(this.mapa);
+      }
+
+      this.formRegistrar.latitud = lat;
+      this.formRegistrar.longitud = lng;
+      this.cdr.detectChanges();
+    });
+
+    this.mapaInicializado = true;
+  }, 300);
+}
+
+abrirRegistrarConMapa() {
+  this.formRegistrar = {
+    nombre: '', correo: '', contrasena: '',
+    telefono: '', nombre_taller: '', direccion: '',
+    latitud: null, longitud: null, descripcion: '',
+    servicios: []
+  };
+  this.marcador = null;
+  this.modalRegistrar = true;
+  this.inicializarMapa();
+}
+toggleServicio(servicio: string) {
+  const index = this.formRegistrar.servicios.findIndex(
+    (s: any) => s.nombre_servicio === servicio
+  );
+  if (index >= 0) {
+    this.formRegistrar.servicios.splice(index, 1);
+  } else {
+    this.formRegistrar.servicios.push({
+      nombre_servicio: servicio,
+      descripcion: '',
+      disponible: true
+    });
+  }
+}
+
+servicioSeleccionado(servicio: string): boolean {
+  return this.formRegistrar.servicios.some(
+    (s: any) => s.nombre_servicio === servicio
+  );
+}
 }

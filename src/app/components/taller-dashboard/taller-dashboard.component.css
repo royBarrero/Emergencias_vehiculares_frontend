@@ -415,5 +415,40 @@
   font-weight: 600;
   cursor: pointer;
 }
+.servicios-grid-dashboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
 
+.servicio-chip-dashboard {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 20px;
+  border: 1px solid #e0e0e0;
+  background: #fafafa;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #555;
+}
+
+.servicio-chip-dashboard:hover {
+  border-color: #2c3e50;
+  color: #2c3e50;
+}
+
+.servicio-chip-dashboard.activo {
+  background: #2c3e50;
+  border-color: #2c3e50;
+  color: #fff;
+  font-weight: 500;
+}
+
+.chip-icono {
+  font-size: 14px;
+  font-weight: 600;
+}
 .btn-guardar:hover { background: #1a2b3c; }

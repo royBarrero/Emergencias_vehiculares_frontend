@@ -106,5 +106,17 @@ obtenerEmergencia(id: number) {
 actualizarEstadoEmergencia(id: number, datos: any) {
   return this.http.patch(`${this.apiUrl}/emergencias/${id}`, datos, this.getAuthHeaders());
 }
+// SERVICIOS
+obtenerServiciosTaller(id_taller: number) {
+  return this.http.get(`${this.apiUrl}/talleres/${id_taller}`);
+}
+
+agregarServicio(id_taller: number, datos: any) {
+  return this.http.post(`${this.apiUrl}/talleres/${id_taller}/servicios`, datos);
+}
+
+eliminarServicio(id_taller: number, id_servicio: number) {
+  return this.http.delete(`${this.apiUrl}/talleres/${id_taller}/servicios/${id_servicio}`);
+}
 }
 

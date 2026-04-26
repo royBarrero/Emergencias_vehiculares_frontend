@@ -26,6 +26,9 @@
       <a [class.activo]="seccionActiva === 'historial'" (click)="cambiarSeccion('historial')">
         📊 Historial
       </a>
+       <a [class.activo]="seccionActiva === 'servicios'" (click)="cambiarSeccion('servicios')">
+          🔧 Mis Servicios
+        </a>
       <a [class.activo]="seccionActiva === 'pagos'" (click)="cambiarSeccion('pagos')">
         💰 Pagos
       </a>
@@ -92,10 +95,10 @@
         <div class="card">
           <h3>🔧 Servicios del taller</h3>
           <div class="servicios-lista">
-            <span class="servicio-badge" *ngFor="let servicio of taller?.servicios">
+            <span class="servicio-badge" *ngFor="let servicio of servicios">
               {{ servicio.nombre_servicio }}
             </span>
-            <p *ngIf="!taller?.servicios?.length" class="sin-datos">
+            <p *ngIf="servicios.length === 0" class="sin-datos">
               No hay servicios registrados
             </p>
           </div>
@@ -109,146 +112,145 @@
     </div>
 
     <!-- TECNICOS -->
-<div *ngIf="seccionActiva === 'tecnicos'">
-  <div class="header-pagina">
-    <h1>👨‍🔧 Mis Técnicos</h1>
-    <p>Personal técnico de tu taller</p>
-    <button class="btn-agregar" (click)="abrirModalTecnico()">+ Agregar técnico</button>
-  </div>
+    <div *ngIf="seccionActiva === 'tecnicos'">
+      <div class="header-pagina">
+        <h1>👨‍🔧 Mis Técnicos</h1>
+        <p>Personal técnico de tu taller</p>
+        <button class="btn-agregar" (click)="abrirModalTecnico()">+ Agregar técnico</button>
+      </div>
 
-  <div class="tabla-container">
-    <table class="tabla">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Nombre</th>
-          <th>Especialidad</th>
-          <th>Teléfono</th>
-          <th>Disponibilidad</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let tecnico of tecnicos">
-          <td>{{ tecnico.id_tecnico }}</td>
-          <td>{{ tecnico.nombre }}</td>
-          <td>{{ tecnico.especialidad || '-' }}</td>
-          <td>{{ tecnico.telefono || '-' }}</td>
-          <td>
-            <span class="estado-badge"
-              [class]="tecnico.estado_disponibilidad === 'disponible' ? 'activo' : 'pendiente'">
-              {{ tecnico.estado_disponibilidad }}
-            </span>
-          </td>
-          <td>
-            <div class="acciones-tabla">
-              <button class="btn-editar" (click)="editarTecnico(tecnico)">✏️ Editar</button>
-              <button class="btn-eliminar" (click)="eliminarTecnico(tecnico.id_tecnico)">🗑️</button>
-            </div>
-          </td>
-        </tr>
-        <tr *ngIf="tecnicos.length === 0">
-          <td colspan="6" class="sin-datos">No hay técnicos registrados</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+      <div class="tabla-container">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nombre</th>
+              <th>Especialidad</th>
+              <th>Teléfono</th>
+              <th>Disponibilidad</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let tecnico of tecnicos">
+              <td>{{ tecnico.id_tecnico }}</td>
+              <td>{{ tecnico.nombre }}</td>
+              <td>{{ tecnico.especialidad || '-' }}</td>
+              <td>{{ tecnico.telefono || '-' }}</td>
+              <td>
+                <span class="estado-badge"
+                  [class]="tecnico.estado_disponibilidad === 'disponible' ? 'activo' : 'pendiente'">
+                  {{ tecnico.estado_disponibilidad }}
+                </span>
+              </td>
+              <td>
+                <div class="acciones-tabla">
+                  <button class="btn-editar" (click)="editarTecnico(tecnico)">✏️ Editar</button>
+                  <button class="btn-eliminar" (click)="eliminarTecnico(tecnico.id_tecnico)">🗑️</button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="tecnicos.length === 0">
+              <td colspan="6" class="sin-datos">No hay técnicos registrados</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-<!-- MODAL TÉCNICO -->
-<div class="modal-overlay" *ngIf="modalTecnicoAbierto" (click)="cerrarModalTecnico()">
-  <div class="modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h3>{{ tecnicoEditando ? 'Editar técnico' : 'Nuevo técnico' }}</h3>
-      <button class="btn-cerrar-modal" (click)="cerrarModalTecnico()">✕</button>
+    <!-- MODAL TÉCNICO -->
+    <div class="modal-overlay" *ngIf="modalTecnicoAbierto" (click)="cerrarModalTecnico()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>{{ tecnicoEditando ? 'Editar técnico' : 'Nuevo técnico' }}</h3>
+          <button class="btn-cerrar-modal" (click)="cerrarModalTecnico()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Nombre completo</label>
+            <input type="text" [(ngModel)]="formTecnico.nombre" placeholder="Ej: Juan Pérez" />
+          </div>
+          <div class="form-group">
+            <label>Correo</label>
+            <input type="email" [(ngModel)]="formTecnico.correo" placeholder="correo@ejemplo.com" />
+          </div>
+          <div class="form-group">
+            <label>Contraseña {{ tecnicoEditando ? '(dejar vacío para no cambiar)' : '' }}</label>
+            <input type="password" [(ngModel)]="formTecnico.contrasena" placeholder="Contraseña" />
+          </div>
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input type="text" [(ngModel)]="formTecnico.telefono" placeholder="Ej: 77712345" />
+          </div>
+          <div class="form-group">
+            <label>Especialidad</label>
+            <input type="text" [(ngModel)]="formTecnico.especialidad" placeholder="Ej: Mecánica general" />
+          </div>
+          <div class="form-group" *ngIf="tecnicoEditando">
+            <label>Disponibilidad</label>
+            <select [(ngModel)]="formTecnico.estado_disponibilidad">
+              <option value="disponible">Disponible</option>
+              <option value="ocupado">Ocupado</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancelar" (click)="cerrarModalTecnico()">Cancelar</button>
+          <button class="btn-guardar" (click)="guardarTecnico()">
+            {{ tecnicoEditando ? 'Guardar cambios' : 'Registrar técnico' }}
+          </button>
+        </div>
+      </div>
     </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label>Nombre completo</label>
-        <input type="text" [(ngModel)]="formTecnico.nombre" placeholder="Ej: Juan Pérez"/>
-      </div>
-      <div class="form-group">
-        <label>Correo</label>
-        <input type="email" [(ngModel)]="formTecnico.correo" placeholder="correo@ejemplo.com"/>
-      </div>
-      <div class="form-group">
-        <label>Contraseña {{ tecnicoEditando ? '(dejar vacío para no cambiar)' : '' }}</label>
-        <input type="password" [(ngModel)]="formTecnico.contrasena" placeholder="Contraseña"/>
-      </div>
-      <div class="form-group">
-        <label>Teléfono</label>
-        <input type="text" [(ngModel)]="formTecnico.telefono" placeholder="Ej: 77712345"/>
-      </div>
-      <div class="form-group">
-        <label>Especialidad</label>
-        <input type="text" [(ngModel)]="formTecnico.especialidad" placeholder="Ej: Mecánica general"/>
-      </div>
-      <div class="form-group" *ngIf="tecnicoEditando">
-        <label>Disponibilidad</label>
-        <select [(ngModel)]="formTecnico.estado_disponibilidad">
-          <option value="disponible">Disponible</option>
-          <option value="ocupado">Ocupado</option>
-        </select>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-cancelar" (click)="cerrarModalTecnico()">Cancelar</button>
-      <button class="btn-guardar" (click)="guardarTecnico()">
-        {{ tecnicoEditando ? 'Guardar cambios' : 'Registrar técnico' }}
-      </button>
-    </div>
-  </div>
-</div>
 
     <!-- HISTORIAL -->
-<div *ngIf="seccionActiva === 'historial'">
-  <div class="header-pagina">
-    <h1>📊 Historial</h1>
-    <p>Emergencias finalizadas atendidas por tu taller</p>
-  </div>
+    <div *ngIf="seccionActiva === 'historial'">
+      <div class="header-pagina">
+        <h1>📊 Historial</h1>
+        <p>Emergencias finalizadas atendidas por tu taller</p>
+      </div>
 
-  <div *ngIf="historialCargando" class="cargando-historial">
-    <p>Cargando historial...</p>
-  </div>
+      <div *ngIf="historialCargando" class="cargando-historial">
+        <p>Cargando historial...</p>
+      </div>
 
-  <div *ngIf="!historialCargando && historial.length === 0" class="card">
-    <p class="sin-datos">No hay emergencias finalizadas aún</p>
-  </div>
+      <div *ngIf="!historialCargando && historial.length === 0" class="card">
+        <p class="sin-datos">No hay emergencias finalizadas aún</p>
+      </div>
 
-  <div class="tabla-container" *ngIf="!historialCargando && historial.length > 0">
-    <table class="tabla">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Tipo de incidente</th>
-          <th>Dirección</th>
-          <th>Técnico</th>
-          <th>Prioridad</th>
-          <th>Fecha</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let e of historial">
-          <td>{{ e.id_emergencia }}</td>
-          <td>{{ e.tipo_incidente }}</td>
-          <td>{{ e.direccion_aproximada || 'Sin dirección' }}</td>
-          <td>
-            <span *ngIf="e.nombre_tecnico">👨‍🔧 {{ e.nombre_tecnico }}</span>
-            <span *ngIf="!e.nombre_tecnico" class="sin-datos">Sin asignar</span>
-          </td>
-          <td>
-            <span class="prioridad-badge"
-              [style.background]="getColorPrioridad(e.prioridad) + '20'"
-              [style.color]="getColorPrioridad(e.prioridad)">
-              {{ e.prioridad }}
-            </span>
-          </td>
-          <td>{{ e.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
+      <div class="tabla-container" *ngIf="!historialCargando && historial.length > 0">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Tipo de incidente</th>
+              <th>Dirección</th>
+              <th>Técnico</th>
+              <th>Prioridad</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let e of historial">
+              <td>{{ e.id_emergencia }}</td>
+              <td>{{ e.tipo_incidente }}</td>
+              <td>{{ e.direccion_aproximada || 'Sin dirección' }}</td>
+              <td>
+                <span *ngIf="e.nombre_tecnico">👨‍🔧 {{ e.nombre_tecnico }}</span>
+                <span *ngIf="!e.nombre_tecnico" class="sin-datos">Sin asignar</span>
+              </td>
+              <td>
+                <span class="prioridad-badge" [style.background]="getColorPrioridad(e.prioridad) + '20'"
+                  [style.color]="getColorPrioridad(e.prioridad)">
+                  {{ e.prioridad }}
+                </span>
+              </td>
+              <td>{{ e.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
     <!-- PAGOS -->
     <div *ngIf="seccionActiva === 'pagos'">
@@ -260,7 +262,29 @@
         <p class="sin-datos">Módulo en desarrollo 🚧</p>
       </div>
     </div>
+<!-- SERVICIOS -->
+<div *ngIf="seccionActiva === 'servicios'">
+  <div class="header-pagina">
+    <h1>🔧 Mis Servicios</h1>
+    <p>Selecciona los servicios que ofrece tu taller</p>
+  </div>
 
+  <div class="card">
+    <p style="font-size:13px;color:#666;margin-bottom:16px;">
+      Haz clic en un servicio para activarlo o desactivarlo. Los servicios activos aparecerán cuando un conductor busque asistencia.
+    </p>
+    <div class="servicios-grid-dashboard">
+      <div
+        *ngFor="let s of serviciosPredefinidos"
+        class="servicio-chip-dashboard"
+        [class.activo]="tieneServicio(s)"
+        (click)="toggleServicioDashboard(s)">
+        <span class="chip-icono">{{ tieneServicio(s) ? '✓' : '+' }}</span>
+        {{ s }}
+      </div>
+    </div>
+  </div>
+</div>
     <!-- PERFIL -->
     <div *ngIf="seccionActiva === 'perfil'">
       <div class="header-pagina">

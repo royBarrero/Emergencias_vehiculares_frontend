@@ -34,7 +34,19 @@ formTecnico: any = {
   estado_disponibilidad: 'disponible'
   
 };
-
+servicios: any[] = [];
+serviciosPredefinidos = [
+  'Mecánica general',
+  'Chaperio y pintura',
+  'Electricidad automotriz',
+  'Llantas y alineación',
+  'Frenos',
+  'Transmisión y caja',
+  'Motor',
+  'Aire acondicionado',
+  'Soldadura',
+  'Grúa y remolque'
+];
   constructor(
     private api: ApiService,
     private router: Router,
@@ -58,6 +70,7 @@ cargarDatos() {
     this.api.obtenerTallerPorUsuario(this.usuario.id_usuario).subscribe({
       next: (data: any) => {
         this.taller = data;
+        this.servicios = data.servicios || []; 
         this.cargarTecnicos(this.taller.id_taller);
         this.cdr.detectChanges();
         this.cargarEstadisticasEmergencias(this.taller.id_taller);
@@ -237,5 +250,50 @@ cargarHistorial() {
 getColorPrioridad(prioridad: string): string {
   const colores: any = { baja: '#4CAF50', media: '#FF9800', alta: '#E53935' };
   return colores[prioridad] || '#999';
+}
+// SERVICIOS DEL TALLER
+cargarServicios() {
+  this.api.obtenerTallerPorUsuario(this.usuario.id_usuario).subscribe({
+    next: (data: any) => {
+      this.ngZone.run(() => {
+        this.servicios = data.servicios || [];
+        this.cdr.detectChanges();
+      });
+    }
+  });
+}
+
+tieneServicio(nombre: string): boolean {
+  return this.servicios.some(s => s.nombre_servicio === nombre);
+}
+
+toggleServicioDashboard(nombre: string) {
+  if (this.tieneServicio(nombre)) {
+    const servicio = this.servicios.find(s => s.nombre_servicio === nombre);
+    if (!servicio) return;
+    this.api.eliminarServicio(this.taller.id_taller, servicio.id_servicio).subscribe({
+      next: () => {
+        this.ngZone.run(() => {
+          this.servicios = this.servicios.filter(s => s.id_servicio !== servicio.id_servicio);
+          this.taller.servicios = this.servicios;
+          this.cdr.detectChanges();
+        });
+      }
+    });
+  } else {
+    this.api.agregarServicio(this.taller.id_taller, {
+      nombre_servicio: nombre,
+      descripcion: '',
+      disponible: true
+    }).subscribe({
+      next: (data: any) => {
+        this.ngZone.run(() => {
+          this.servicios.push(data);
+          this.taller.servicios = this.servicios;
+          this.cdr.detectChanges();
+        });
+      }
+    });
+  }
 }
 }
