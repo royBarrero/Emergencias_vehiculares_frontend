@@ -23,8 +23,10 @@ export class TallerDashboardComponent implements OnInit {
   serviciosAtendidos: number = 0;
   modalTecnicoAbierto: boolean = false;
   historial: any[] = [];
-historialCargando: boolean = false;
-tecnicoEditando: any = null;
+  historialCargando: boolean = false;
+  tecnicoEditando: any = null;
+  pagoSeleccionado: any = null;
+  pagosHistorial: any[] = [];
 formTecnico: any = {
   nombre: '',
   correo: '',
@@ -106,6 +108,9 @@ cargarDatos() {
   this.menuAbierto = false;
   if (seccion === 'historial') {
     this.cargarHistorial();
+  }
+  if (seccion === 'pagos') {
+    this.cargarPagos();
   }
 }
   cargarEstadisticasEmergencias(id_taller: number) {
@@ -294,5 +299,58 @@ toggleServicioDashboard(nombre: string) {
       }
     });
   }
+}
+verPago(id_emergencia: number) {
+  this.api.obtenerPagoEmergencia(id_emergencia).subscribe({
+    next: (data: any) => {
+      this.ngZone.run(() => {
+        this.pagoSeleccionado = data;
+        this.cdr.detectChanges();
+      });
+    },
+    error: () => {
+      this.pagoSeleccionado = null;
+    }
+  });
+}
+cargarPagos() {
+  if (!this.taller) return;
+  this.api.obtenerEmergenciasTaller(this.taller.id_taller).subscribe({
+    next: (emergencias: any) => {
+      const finalizadas = emergencias.filter((e: any) => e.estado === 'finalizada');
+      const pagosPromises: any[] = [];
+
+      finalizadas.forEach((e: any) => {
+        this.api.obtenerPagoEmergencia(e.id_emergencia).subscribe({
+          next: (pago: any) => {
+            this.ngZone.run(() => {
+              if (pago) {
+                pagosPromises.push({
+                  ...pago,
+                  tipo_incidente: e.tipo_incidente,
+                  nombre_tecnico: e.nombre_tecnico,
+                  fecha: e.created_at
+                });
+                this.pagosHistorial = [...pagosPromises];
+                this.cdr.detectChanges();
+              }
+            });
+          }
+        });
+      });
+    }
+  });
+}
+
+getTotalBruto(): number {
+  return Math.round(this.pagosHistorial.reduce((sum, p) => sum + p.monto_total, 0) * 100) / 100;
+}
+
+getTotalComision(): number {
+  return Math.round(this.pagosHistorial.reduce((sum, p) => sum + p.comision, 0) * 100) / 100;
+}
+
+getTotalNeto(): number {
+  return Math.round(this.pagosHistorial.reduce((sum, p) => sum + p.monto_neto, 0) * 100) / 100;
 }
 }

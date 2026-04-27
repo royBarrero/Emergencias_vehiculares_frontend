@@ -204,64 +204,161 @@
     </div>
 
     <!-- HISTORIAL -->
-    <div *ngIf="seccionActiva === 'historial'">
-      <div class="header-pagina">
-        <h1>📊 Historial</h1>
-        <p>Emergencias finalizadas atendidas por tu taller</p>
-      </div>
+<div *ngIf="seccionActiva === 'historial'">
+  <div class="header-pagina">
+    <h1>📊 Historial</h1>
+    <p>Emergencias finalizadas atendidas por tu taller</p>
+  </div>
 
-      <div *ngIf="historialCargando" class="cargando-historial">
-        <p>Cargando historial...</p>
-      </div>
+  <div *ngIf="historialCargando" class="cargando-historial">
+    <p>Cargando historial...</p>
+  </div>
 
-      <div *ngIf="!historialCargando && historial.length === 0" class="card">
-        <p class="sin-datos">No hay emergencias finalizadas aún</p>
-      </div>
+  <div *ngIf="!historialCargando && historial.length === 0" class="card">
+    <p class="sin-datos">No hay emergencias finalizadas aún</p>
+  </div>
 
-      <div class="tabla-container" *ngIf="!historialCargando && historial.length > 0">
-        <table class="tabla">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Tipo de incidente</th>
-              <th>Dirección</th>
-              <th>Técnico</th>
-              <th>Prioridad</th>
-              <th>Fecha</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let e of historial">
-              <td>{{ e.id_emergencia }}</td>
-              <td>{{ e.tipo_incidente }}</td>
-              <td>{{ e.direccion_aproximada || 'Sin dirección' }}</td>
-              <td>
-                <span *ngIf="e.nombre_tecnico">👨‍🔧 {{ e.nombre_tecnico }}</span>
-                <span *ngIf="!e.nombre_tecnico" class="sin-datos">Sin asignar</span>
-              </td>
-              <td>
-                <span class="prioridad-badge" [style.background]="getColorPrioridad(e.prioridad) + '20'"
-                  [style.color]="getColorPrioridad(e.prioridad)">
-                  {{ e.prioridad }}
-                </span>
-              </td>
-              <td>{{ e.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
-            </tr>
-          </tbody>
-        </table>
+  <div class="grid-dos" *ngIf="!historialCargando && historial.length > 0">
+
+    <!-- Lista -->
+    <div class="tabla-container">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Tipo</th>
+            <th>Técnico</th>
+            <th>Prioridad</th>
+            <th>Fecha</th>
+            <th>Pago</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of historial" (click)="verPago(e.id_emergencia)"
+              style="cursor:pointer">
+            <td>{{ e.id_emergencia }}</td>
+            <td>{{ e.tipo_incidente }}</td>
+            <td>
+              <span *ngIf="e.nombre_tecnico">{{ e.nombre_tecnico }}</span>
+              <span *ngIf="!e.nombre_tecnico" class="sin-datos">Sin asignar</span>
+            </td>
+            <td>
+              <span class="prioridad-badge"
+                [style.background]="getColorPrioridad(e.prioridad) + '20'"
+                [style.color]="getColorPrioridad(e.prioridad)">
+                {{ e.prioridad }}
+              </span>
+            </td>
+            <td>{{ e.created_at | date:'dd/MM/yyyy' }}</td>
+            <td>
+              <span class="estado-badge activo">Ver</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Detalle pago -->
+    <div class="card" *ngIf="pagoSeleccionado">
+      <h3>💰 Detalle de pago</h3>
+      <div class="perfil-item">
+        <label>Monto total cobrado</label>
+        <p style="font-size:22px;font-weight:700;color:#2c3e50;">
+          Bs. {{ pagoSeleccionado.monto_total }}
+        </p>
+      </div>
+      <div class="perfil-item">
+        <label>Comisión plataforma (10%)</label>
+        <p style="color:#E53935;font-weight:600;">- Bs. {{ pagoSeleccionado.comision }}</p>
+      </div>
+      <div class="perfil-item" style="border-top:2px solid #2c3e50;padding-top:12px;">
+        <label>Monto neto para tu taller</label>
+        <p style="font-size:20px;font-weight:700;color:#4CAF50;">
+          Bs. {{ pagoSeleccionado.monto_neto }}
+        </p>
+      </div>
+      <div class="perfil-item">
+        <label>Método de pago</label>
+        <p>{{ pagoSeleccionado.metodo_pago | uppercase }}</p>
+      </div>
+      <div class="perfil-item">
+        <label>Estado</label>
+        <span class="estado-badge activo">{{ pagoSeleccionado.estado }}</span>
       </div>
     </div>
+
+    <div class="card" *ngIf="!pagoSeleccionado">
+      <p class="sin-datos">Selecciona una emergencia para ver el detalle del pago</p>
+    </div>
+
+  </div>
+</div>
 
     <!-- PAGOS -->
-    <div *ngIf="seccionActiva === 'pagos'">
-      <div class="header-pagina">
-        <h1>💰 Pagos</h1>
-        <p>Historial de pagos y comisiones</p>
-      </div>
-      <div class="card">
-        <p class="sin-datos">Módulo en desarrollo 🚧</p>
-      </div>
+<div *ngIf="seccionActiva === 'pagos'">
+  <div class="header-pagina">
+    <h1>💰 Pagos y comisiones</h1>
+    <p>Resumen financiero de tu taller</p>
+  </div>
+
+  <div class="metricas">
+    <div class="metrica-card verde">
+      <p class="metrica-label">Servicios finalizados</p>
+      <p class="metrica-valor">{{ historial.length }}</p>
+      <p class="metrica-sub">total</p>
     </div>
+    <div class="metrica-card azul">
+      <p class="metrica-label">Ingresos brutos</p>
+      <p class="metrica-valor">Bs. {{ getTotalBruto() }}</p>
+      <p class="metrica-sub">antes de comisión</p>
+    </div>
+    <div class="metrica-card rojo">
+      <p class="metrica-label">Comisión plataforma</p>
+      <p class="metrica-valor">Bs. {{ getTotalComision() }}</p>
+      <p class="metrica-sub">10% por servicio</p>
+    </div>
+    <div class="metrica-card naranja">
+      <p class="metrica-label">Ingresos netos</p>
+      <p class="metrica-valor">Bs. {{ getTotalNeto() }}</p>
+      <p class="metrica-sub">después de comisión</p>
+    </div>
+  </div>
+
+  <div class="tabla-container" *ngIf="pagosHistorial.length > 0">
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Tipo de servicio</th>
+          <th>Técnico</th>
+          <th>Método</th>
+          <th>Monto total</th>
+          <th>Comisión</th>
+          <th>Neto taller</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of pagosHistorial">
+          <td>{{ p.id_emergencia }}</td>
+          <td>{{ p.tipo_incidente }}</td>
+          <td>{{ p.nombre_tecnico || '-' }}</td>
+          <td>
+            <span class="estado-badge activo">{{ p.metodo_pago | uppercase }}</span>
+          </td>
+          <td>Bs. {{ p.monto_total }}</td>
+          <td style="color:#E53935">- Bs. {{ p.comision }}</td>
+          <td style="color:#4CAF50;font-weight:600;">Bs. {{ p.monto_neto }}</td>
+          <td>{{ p.fecha | date:'dd/MM/yyyy' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" *ngIf="pagosHistorial.length === 0">
+    <p class="sin-datos">No hay pagos registrados aún</p>
+  </div>
+</div>
 <!-- SERVICIOS -->
 <div *ngIf="seccionActiva === 'servicios'">
   <div class="header-pagina">

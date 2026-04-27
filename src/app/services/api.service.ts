@@ -121,5 +121,18 @@ eliminarServicio(id_taller: number, id_servicio: number) {
 obtenerTalleresCercanos(id_emergencia: number) {
   return this.http.get(`${this.apiUrl}/talleres/cercanos/${id_emergencia}`);
 }
+registrarPago(datos: any) {
+  const token = localStorage.getItem('token');
+  return this.http.post(`${this.apiUrl}/pagos/`, datos, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+}
+
+obtenerPagoEmergencia(id_emergencia: number) {
+  const token = localStorage.getItem('token');
+  return this.http.get(`${this.apiUrl}/pagos/emergencia/${id_emergencia}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+}
 }
 
