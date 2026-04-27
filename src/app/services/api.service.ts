@@ -52,6 +52,9 @@ obtenerTallerPorUsuario(id_usuario: number) {
 listarTodosTecnicos() {
   return this.http.get(`${this.apiUrl}/tecnicos/`);
 }
+eliminarTecnico(id: number) {
+  return this.http.delete(`${this.apiUrl}/tecnicos/${id}`);
+}
   // ROLES
   obtenerRoles() {
     return this.http.get(`${this.apiUrl}/roles`);
@@ -83,10 +86,11 @@ obtenerEstadisticas() {
 }
 // EMERGENCIAS
 getAuthHeaders() {
+  const usuario = localStorage.getItem('usuario');
   const token = localStorage.getItem('token');
+  console.log('TOKEN ANGULAR:', token); // agregar para debug
   return { headers: { Authorization: `Bearer ${token}` } };
 }
-
 obtenerEmergenciasPendientes() {
   return this.http.get(`${this.apiUrl}/emergencias/pendientes`, this.getAuthHeaders());
 }
@@ -101,6 +105,34 @@ obtenerEmergencia(id: number) {
 
 actualizarEstadoEmergencia(id: number, datos: any) {
   return this.http.patch(`${this.apiUrl}/emergencias/${id}`, datos, this.getAuthHeaders());
+}
+// SERVICIOS
+obtenerServiciosTaller(id_taller: number) {
+  return this.http.get(`${this.apiUrl}/talleres/${id_taller}`);
+}
+
+agregarServicio(id_taller: number, datos: any) {
+  return this.http.post(`${this.apiUrl}/talleres/${id_taller}/servicios`, datos);
+}
+
+eliminarServicio(id_taller: number, id_servicio: number) {
+  return this.http.delete(`${this.apiUrl}/talleres/${id_taller}/servicios/${id_servicio}`);
+}
+obtenerTalleresCercanos(id_emergencia: number) {
+  return this.http.get(`${this.apiUrl}/talleres/cercanos/${id_emergencia}`);
+}
+registrarPago(datos: any) {
+  const token = localStorage.getItem('token');
+  return this.http.post(`${this.apiUrl}/pagos/`, datos, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+}
+
+obtenerPagoEmergencia(id_emergencia: number) {
+  const token = localStorage.getItem('token');
+  return this.http.get(`${this.apiUrl}/pagos/emergencia/${id_emergencia}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
 }
 }
 

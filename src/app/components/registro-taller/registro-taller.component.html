@@ -1,0 +1,145 @@
+<div class="registro-container">
+  <div class="registro-card">
+
+    <!-- HEADER -->
+    <div class="registro-header">
+      <div class="logo">🔧</div>
+      <h1>EmergenciasVial</h1>
+      <p>Registro de taller mecánico</p>
+    </div>
+
+    <!-- INDICADOR DE PASOS -->
+    <div class="pasos-indicador" *ngIf="paso < 4">
+      <div class="paso-item" [class.activo]="paso >= 1" [class.completado]="paso > 1">
+        <div class="paso-numero">{{ paso > 1 ? '✓' : '1' }}</div>
+        <span>Datos personales</span>
+      </div>
+      <div class="paso-linea" [class.completado]="paso > 1"></div>
+      <div class="paso-item" [class.activo]="paso >= 2" [class.completado]="paso > 2">
+        <div class="paso-numero">{{ paso > 2 ? '✓' : '2' }}</div>
+        <span>Ubicación</span>
+      </div>
+      <div class="paso-linea" [class.completado]="paso > 2"></div>
+      <div class="paso-item" [class.activo]="paso >= 3" [class.completado]="paso > 3">
+        <div class="paso-numero">3</div>
+        <span>Servicios</span>
+      </div>
+    </div>
+
+    <div class="error-msg" *ngIf="error">❌ {{ error }}</div>
+
+    <!-- PASO 1: DATOS PERSONALES -->
+    <div *ngIf="paso === 1" class="paso-contenido">
+      <h2>Datos del responsable</h2>
+      <div class="form-group">
+        <label>Nombre completo *</label>
+        <input type="text" [(ngModel)]="form.nombre" placeholder="Juan Pérez"/>
+      </div>
+      <div class="form-group">
+        <label>Correo electrónico *</label>
+        <input type="email" [(ngModel)]="form.correo" placeholder="correo@ejemplo.com"/>
+      </div>
+      <div class="form-group">
+        <label>Contraseña *</label>
+        <input type="password" [(ngModel)]="form.contrasena" placeholder="Mínimo 6 caracteres"/>
+      </div>
+      <div class="form-group">
+        <label>Confirmar contraseña *</label>
+        <input type="password" [(ngModel)]="form.confirmarContrasena" placeholder="Repite la contraseña"/>
+      </div>
+      <div class="form-group">
+        <label>Teléfono</label>
+        <input type="text" [(ngModel)]="form.telefono" placeholder="Ej: 77712345"/>
+      </div>
+      <div class="form-group">
+        <label>Nombre del taller *</label>
+        <input type="text" [(ngModel)]="form.nombre_taller" placeholder="Ej: Taller Mecánico Central"/>
+      </div>
+      <button class="btn-siguiente" (click)="siguientePaso()">Siguiente →</button>
+      <p class="login-link">¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión</a></p>
+    </div>
+
+    <!-- PASO 2: UBICACIÓN -->
+    <div *ngIf="paso === 2" class="paso-contenido">
+      <h2>Ubicación del taller</h2>
+      <div class="form-group">
+        <label>Dirección de referencia</label>
+        <input type="text" [(ngModel)]="form.direccion" placeholder="Ej: Av. Banzer km 5, Santa Cruz"/>
+      </div>
+      <div class="form-group">
+        <label>Marca la ubicación exacta en el mapa</label>
+        <div id="mapa-registro-publico" class="mapa-contenedor"></div>
+        <div class="coordenadas-info" *ngIf="form.latitud">
+          📍 Lat: {{ form.latitud | number:'1.4-4' }}, Lng: {{ form.longitud | number:'1.4-4' }}
+        </div>
+        <div class="coordenadas-info sin-marcar" *ngIf="!form.latitud">
+          Toca el mapa para marcar la ubicación de tu taller
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Descripción del taller</label>
+        <textarea [(ngModel)]="form.descripcion" rows="2" placeholder="Describe brevemente tu taller..."></textarea>
+      </div>
+      <div class="botones-navegacion">
+        <button class="btn-anterior" (click)="anteriorPaso()">← Anterior</button>
+        <button class="btn-siguiente" (click)="siguientePaso()">Siguiente →</button>
+      </div>
+    </div>
+
+    <!-- PASO 3: SERVICIOS Y COMISIÓN -->
+    <div *ngIf="paso === 3" class="paso-contenido">
+      <h2>Servicios y condiciones</h2>
+
+      <!-- AVISO COMISIÓN -->
+      <div class="comision-aviso">
+        <div class="comision-icono">💰</div>
+        <div>
+          <h3>Comisión de la plataforma</h3>
+          <p>EmergenciasVial cobra una comisión del <strong>10%</strong> sobre cada servicio completado. Esta comisión permite mantener la plataforma y conectarte con conductores en emergencia.</p>
+          <ul>
+            <li>✅ Acceso ilimitado a solicitudes de emergencia</li>
+            <li>✅ Sistema de asignación inteligente</li>
+            <li>✅ Panel de gestión completo</li>
+            <li>✅ Soporte técnico</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Selecciona tus servicios</h3>
+      <p class="hint">Selecciona los servicios que ofrece tu taller</p>
+      <div class="servicios-grid">
+        <div
+          *ngFor="let s of serviciosPredefinidos"
+          class="servicio-chip"
+          [class.seleccionado]="servicioSeleccionado(s)"
+          (click)="toggleServicio(s)">
+          {{ servicioSeleccionado(s) ? '✓' : '+' }} {{ s }}
+        </div>
+      </div>
+
+      <div class="aceptar-comision">
+        <input type="checkbox" id="aceptaComision" [(ngModel)]="form.aceptaComision"/>
+        <label for="aceptaComision">
+          Acepto los términos y la comisión del 10% por servicio completado
+        </label>
+      </div>
+
+      <div class="botones-navegacion">
+        <button class="btn-anterior" (click)="anteriorPaso()">← Anterior</button>
+        <button class="btn-registrar" (click)="registrar()" [disabled]="cargando">
+          {{ cargando ? 'Registrando...' : 'Completar registro' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- PASO 4: ÉXITO -->
+    <div *ngIf="paso === 4" class="paso-exito">
+      <div class="exito-icono">✅</div>
+      <h2>¡Registro exitoso!</h2>
+      <p>Tu taller ha sido registrado correctamente. Un administrador revisará tu solicitud y activará tu cuenta.</p>
+      <p class="exito-sub">Recibirás una notificación cuando tu cuenta esté activa.</p>
+      <a routerLink="/login" class="btn-siguiente">Ir al login</a>
+    </div>
+
+  </div>
+</div>

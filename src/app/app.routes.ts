@@ -6,6 +6,7 @@ import { TecnicosComponent } from './components/tecnicos/tecnicos.component';
 import { RolesComponent } from './components/roles/roles.component';
 import { UsuariosComponent } from './components/usuarios/usuarios.component';
 import { TallerDashboardComponent } from './components/taller-dashboard/taller-dashboard.component';
+import { RegistroTallerComponent } from './components/registro-taller/registro-taller.component';
 import { EmergenciasTallerComponent } from './components/emergencias/emergencias-taller.component';
 
 export const routes: Routes = [
@@ -18,6 +19,7 @@ export const routes: Routes = [
   {path: 'usuarios', component: UsuariosComponent },
   { path: 'taller-dashboard', component: TallerDashboardComponent },
   { path: 'emergencias-taller', component: EmergenciasTallerComponent },
+  { path: 'registro', component: RegistroTallerComponent },
   { path: '**', redirectTo: 'login' }
   
 ];

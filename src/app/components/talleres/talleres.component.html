@@ -8,8 +8,8 @@
       <h2>EmergenciasVial</h2>
     </div>
     <nav class="menu">
-      <a routerLink="/dashboard" routerLinkActive="activo"
-        [routerLinkActiveOptions]="{exact:true}" (click)="menuAbierto=false">
+      <a routerLink="/dashboard" routerLinkActive="activo" [routerLinkActiveOptions]="{exact:true}"
+        (click)="menuAbierto=false">
         🏠 Inicio
       </a>
       <a routerLink="/usuarios" routerLinkActive="activo" (click)="menuAbierto=false">
@@ -82,53 +82,68 @@
 
     <!-- MODAL REGISTRAR -->
     <div class="modal-overlay" *ngIf="modalRegistrar">
-      <div class="modal">
+      <div class="modal modal-grande">
         <h2>🔧 Nuevo Taller</h2>
         <div class="form-grid">
           <div class="form-group">
             <label>Nombre del responsable</label>
-            <input type="text" [(ngModel)]="formRegistrar.nombre" class="input-field"/>
+            <input type="text" [(ngModel)]="formRegistrar.nombre" class="input-field" />
           </div>
           <div class="form-group">
             <label>Correo</label>
-            <input type="email" [(ngModel)]="formRegistrar.correo" class="input-field"/>
+            <input type="email" [(ngModel)]="formRegistrar.correo" class="input-field" />
           </div>
           <div class="form-group">
             <label>Contraseña</label>
-            <input type="password" [(ngModel)]="formRegistrar.contrasena" class="input-field"/>
+            <input type="password" [(ngModel)]="formRegistrar.contrasena" class="input-field" />
           </div>
           <div class="form-group">
             <label>Teléfono</label>
-            <input type="text" [(ngModel)]="formRegistrar.telefono" class="input-field"/>
+            <input type="text" [(ngModel)]="formRegistrar.telefono" class="input-field" />
           </div>
           <div class="form-group">
             <label>Nombre del taller</label>
-            <input type="text" [(ngModel)]="formRegistrar.nombre_taller" class="input-field"/>
+            <input type="text" [(ngModel)]="formRegistrar.nombre_taller" class="input-field" />
           </div>
           <div class="form-group">
-            <label>Dirección</label>
-            <input type="text" [(ngModel)]="formRegistrar.direccion" class="input-field"/>
-          </div>
-          <div class="form-group">
-            <label>Latitud</label>
-            <input type="number" [(ngModel)]="formRegistrar.latitud" class="input-field"/>
-          </div>
-          <div class="form-group">
-            <label>Longitud</label>
-            <input type="number" [(ngModel)]="formRegistrar.longitud" class="input-field"/>
+            <label>Dirección (referencia)</label>
+            <input type="text" [(ngModel)]="formRegistrar.direccion" class="input-field"
+              placeholder="Ej: Av. Banzer km 5" />
           </div>
           <div class="form-group full-width">
             <label>Descripción</label>
-            <textarea [(ngModel)]="formRegistrar.descripcion" class="input-field" rows="3"></textarea>
+            <textarea [(ngModel)]="formRegistrar.descripcion" class="input-field" rows="2"></textarea>
+          </div>
+          <!-- SERVICIOS -->
+          <div class="form-group full-width">
+            <label>Servicios que ofrece el taller</label>
+            <div class="servicios-grid">
+              <div *ngFor="let servicio of serviciosPredefinidos" class="servicio-chip"
+                [class.seleccionado]="servicioSeleccionado(servicio)" (click)="toggleServicio(servicio)">
+                {{ servicio }}
+              </div>
+            </div>
+          </div>
+          <!-- MAPA -->
+          <div class="form-group full-width">
+            <label>Ubicación en el mapa <span class="label-hint">— haz clic para marcar la ubicación
+                exacta</span></label>
+            <div id="mapa-registro" class="mapa-contenedor"></div>
+            <div class="coordenadas-info" *ngIf="formRegistrar.latitud">
+              📍 Lat: {{ formRegistrar.latitud | number:'1.4-4' }}, Lng: {{ formRegistrar.longitud | number:'1.4-4' }}
+            </div>
+            <div class="coordenadas-info sin-marcar" *ngIf="!formRegistrar.latitud">
+              Toca el mapa para marcar la ubicación del taller
+            </div>
           </div>
         </div>
+
         <div class="modal-botones">
           <button class="btn-cancelar" (click)="modalRegistrar=false">Cancelar</button>
           <button class="btn-guardar" (click)="guardarTaller()">Registrar</button>
         </div>
       </div>
     </div>
-
     <!-- MODAL EDITAR -->
     <div class="modal-overlay" *ngIf="modalEditar">
       <div class="modal">
@@ -136,15 +151,15 @@
         <div class="form-grid">
           <div class="form-group">
             <label>Nombre del taller</label>
-            <input type="text" [(ngModel)]="formEditar.nombre_taller" class="input-field"/>
+            <input type="text" [(ngModel)]="formEditar.nombre_taller" class="input-field" />
           </div>
           <div class="form-group">
             <label>Dirección</label>
-            <input type="text" [(ngModel)]="formEditar.direccion" class="input-field"/>
+            <input type="text" [(ngModel)]="formEditar.direccion" class="input-field" />
           </div>
           <div class="form-group">
             <label>Teléfono</label>
-            <input type="text" [(ngModel)]="formEditar.telefono" class="input-field"/>
+            <input type="text" [(ngModel)]="formEditar.telefono" class="input-field" />
           </div>
           <div class="form-group">
             <label>Estado</label>

@@ -115,7 +115,65 @@
           <span class="label">Audio IA</span>
           <span class="valor transcripcion">{{ emergenciaSeleccionada.transcripcion_audio }}</span>
         </div>
+<!-- EVIDENCIAS -->
+<div class="evidencias-seccion" *ngIf="emergenciaSeleccionada.evidencias?.length > 0">
+  <p class="seccion-label">Evidencias del conductor</p>
 
+  <!-- Fotos -->
+  <ng-container *ngFor="let e of emergenciaSeleccionada.evidencias">
+    <div *ngIf="e.tipo === 'foto'" class="evidencia-bloque">
+      <div class="foto-item">
+        <img [src]="e.url_archivo" alt="Evidencia" (click)="abrirFoto(e.url_archivo)"/>
+      </div>
+
+      <!-- Diagnóstico IA de la foto -->
+      <div class="ia-resultado" *ngIf="e.clasificacion_ia">
+        <div class="ia-header">
+          <span class="ia-icono">🤖</span>
+          <span class="ia-titulo">Diagnóstico IA — Imagen</span>
+        </div>
+        <p class="ia-texto">{{ e.clasificacion_ia }}</p>
+      </div>
+      <div class="ia-pendiente" *ngIf="!e.clasificacion_ia">
+        <span>🤖 Análisis de imagen no disponible</span>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Audio -->
+  <ng-container *ngFor="let e of emergenciaSeleccionada.evidencias">
+    <div *ngIf="e.tipo === 'audio'" class="evidencia-bloque">
+      <p class="seccion-label">Audio del conductor</p>
+      <audio controls [src]="e.url_archivo" style="width:100%"></audio>
+
+      <!-- Transcripción IA del audio -->
+      <div class="ia-resultado audio-ia" *ngIf="e.transcripcion">
+        <div class="ia-header">
+          <span class="ia-icono">🎙️</span>
+          <span class="ia-titulo">Transcripción IA — Audio</span>
+        </div>
+        <p class="ia-texto">{{ e.transcripcion }}</p>
+      </div>
+      <div class="ia-pendiente" *ngIf="!e.transcripcion">
+        <span>🎙️ Transcripción de audio no disponible</span>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<!-- Si no hay evidencias -->
+<div class="ia-pendiente" *ngIf="!emergenciaSeleccionada.evidencias?.length">
+  <span>📎 El conductor no adjuntó evidencias</span>
+</div>
+<!-- MAPA -->
+<div class="mapa-seccion">
+  <p class="seccion-label">Ubicación</p>
+  <div class="mapa-placeholder" (click)="abrirMapa()">
+    <span>🗺️</span>
+    <p>{{ emergenciaSeleccionada.latitud | number:'1.4-4' }}, {{ emergenciaSeleccionada.longitud | number:'1.4-4' }}</p>
+    <small>Clic para ver en Google Maps</small>
+  </div>
+</div>
         <!-- Acciones según estado -->
         <div class="acciones">
 

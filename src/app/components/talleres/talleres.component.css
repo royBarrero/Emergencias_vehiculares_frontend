@@ -224,7 +224,71 @@
   background: rgba(0,0,0,0.5);
   z-index: 99;
 }
+.modal-grande {
+  max-width: 700px;
+  width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
 
+.mapa-contenedor {
+  width: 100%;
+  height: 300px;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  margin-top: 6px;
+  z-index: 0;
+}
+
+.coordenadas-info {
+  font-size: 12px;
+  color: #2c3e50;
+  font-weight: 500;
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: #e8f5e9;
+  border-radius: 6px;
+}
+
+.coordenadas-info.sin-marcar {
+  background: #fff3e0;
+  color: #F57C00;
+}
+
+.label-hint {
+  font-weight: normal;
+  color: #999;
+  font-size: 11px;
+}
+.servicios-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.servicio-chip {
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1px solid #e0e0e0;
+  background: #fafafa;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #555;
+}
+
+.servicio-chip:hover {
+  border-color: #2c3e50;
+  color: #2c3e50;
+}
+
+.servicio-chip.seleccionado {
+  background: #2c3e50;
+  border-color: #2c3e50;
+  color: #fff;
+  font-weight: 500;
+}
 .overlay.visible { display: block; }
 
 @media (max-width: 768px) {
