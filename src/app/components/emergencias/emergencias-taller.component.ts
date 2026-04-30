@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit,OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api.service';
@@ -10,7 +10,7 @@ import { ApiService } from '../../services/api.service';
   templateUrl: './emergencias-taller.component.html',
   styleUrl: './emergencias-taller.component.css'
 })
-export class EmergenciasTallerComponent implements OnInit {
+export class EmergenciasTallerComponent implements OnInit,OnDestroy {
   emergenciasPendientes: any[] = [];
   emergenciasTaller: any[] = [];
   emergenciaSeleccionada: any = null;
@@ -19,6 +19,9 @@ export class EmergenciasTallerComponent implements OnInit {
   usuario: any;
   cargando = false;
   tabActiva: string = 'pendientes';
+  ultimaCantidadPendientes: number = 0;
+  notificacionesActivas: boolean = false;
+  private intervalo: any;
 
   // Para asignar técnico
   idTecnicoSeleccionado: number | null = null;
@@ -33,9 +36,17 @@ export class EmergenciasTallerComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.cargarDatos();
+  this.cargarDatos();
+  this.activarNotificaciones();
+  this.intervalo = setInterval(() => {
+    this.cargarEmergencias();
+  }, 15000);
+}
+ngOnDestroy() {
+  if (this.intervalo) {
+    clearInterval(this.intervalo);
   }
-
+}
   cargarDatos() {
     this.api.obtenerTallerPorUsuario(this.usuario.id_usuario).subscribe({
       next: (data: any) => {
@@ -49,30 +60,42 @@ export class EmergenciasTallerComponent implements OnInit {
     });
   }
 
-  cargarEmergencias() {
-    this.cargando = true;
+cargarEmergencias() {
+  this.cargando = true;
 
-    this.api.obtenerEmergenciasPendientes().subscribe({
-      next: (data: any) => {
-        this.ngZone.run(() => {
-          this.emergenciasPendientes = data;
-          this.cargando = false;
-          this.cdr.detectChanges();
-        });
-      },
-      error: () => { this.cargando = false; }
-    });
+  this.api.obtenerEmergenciasPendientes().subscribe({
+    next: (data: any) => {
+      this.ngZone.run(() => {
+        const nuevasCantidad = data.length;
+        
+        // Si hay más emergencias que antes notificar
+        if (this.ultimaCantidadPendientes > 0 && 
+            nuevasCantidad > this.ultimaCantidadPendientes) {
+          const nuevas = nuevasCantidad - this.ultimaCantidadPendientes;
+          this.enviarNotificacion(
+            '🚨 Nueva emergencia',
+            `Tienes ${nuevas} nueva${nuevas > 1 ? 's' : ''} solicitud${nuevas > 1 ? 'es' : ''} pendiente${nuevas > 1 ? 's' : ''}`
+          );
+        }
+        
+        this.ultimaCantidadPendientes = nuevasCantidad;
+        this.emergenciasPendientes = data;
+        this.cargando = false;
+        this.cdr.detectChanges();
+      });
+    },
+    error: () => { this.cargando = false; }
+  });
 
-    this.api.obtenerEmergenciasTaller(this.taller.id_taller).subscribe({
-      next: (data: any) => {
-        this.ngZone.run(() => {
-          this.emergenciasTaller = data;
-          this.cdr.detectChanges();
-        });
-      }
-    });
-  }
-
+  this.api.obtenerEmergenciasTaller(this.taller.id_taller).subscribe({
+    next: (data: any) => {
+      this.ngZone.run(() => {
+        this.emergenciasTaller = data;
+        this.cdr.detectChanges();
+      });
+    }
+  });
+}
   cargarTecnicos() {
     this.api.obtenerTecnicosTaller(this.taller.id_taller).subscribe({
       next: (data: any) => {
@@ -192,5 +215,23 @@ abrirMapa() {
   const lat = this.emergenciaSeleccionada.latitud;
   const lng = this.emergenciaSeleccionada.longitud;
   window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
+}
+async activarNotificaciones() {
+  if (!('Notification' in window)) return;
+  
+  const permiso = await Notification.requestPermission();
+  if (permiso === 'granted') {
+    this.notificacionesActivas = true;
+  }
+}
+
+enviarNotificacion(titulo: string, mensaje: string) {
+  if (!this.notificacionesActivas) return;
+  if (Notification.permission !== 'granted') return;
+  
+  new Notification(titulo, {
+    body: mensaje,
+    icon: '/favicon.ico'
+  });
 }
 }
