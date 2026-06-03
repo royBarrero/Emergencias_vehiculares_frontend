@@ -1,0 +1,104 @@
+<div class="p-6">
+
+  <div *ngIf="!tenantSeleccionado">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-semibold text-gray-800">Gestión de Tenants</h2>
+      <button (click)="abrirModal()"
+        class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Nuevo Tenant
+      </button>
+    </div>
+
+    <!-- Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div *ngFor="let tenant of tenants" (click)="verDetalle(tenant)"
+        class="bg-white border border-gray-200 rounded-2xl p-5 cursor-pointer hover:shadow-md hover:-translate-y-1 transition-all border-l-4 border-l-blue-600">
+        <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center mb-3">
+  <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+  </svg>
+</div>
+        <h4 class="text-base font-semibold text-gray-900 mb-1">{{ tenant.nombre }}</h4>
+        <p class="text-sm text-gray-500 mb-4">{{ tenant.descripcion }}</p>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600">{{ tenant.total_talleres }} talleres</span>
+          <span [class]="tenant.estado ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+            class="px-3 py-1 rounded-full text-xs font-semibold">
+            {{ tenant.estado ? 'Activo' : 'Inactivo' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detalle tenant -->
+  <div *ngIf="tenantSeleccionado">
+    <button (click)="tenantSeleccionado = null"
+      class="flex items-center gap-2 text-blue-600 text-sm font-medium mb-5 hover:underline">
+      ← Volver
+    </button>
+    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+      <h3 class="text-xl font-bold text-gray-900 mb-1">{{ tenantSeleccionado.nombre }}</h3>
+      <p class="text-sm text-gray-500 mb-6">{{ tenantSeleccionado.descripcion }}</p>
+      <h4 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">Talleres</h4>
+      <table class="w-full">
+        <thead>
+          <tr class="bg-gray-50">
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Nombre</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Estado</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Calificación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let taller of tenantSeleccionado.talleres" class="border-t border-gray-100">
+            <td class="px-4 py-3 text-sm text-gray-800">{{ taller.nombre_taller }}</td>
+            <td class="px-4 py-3">
+              <span [class]="taller.estado === 'activo' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+                class="px-3 py-1 rounded-full text-xs font-semibold">
+                {{ taller.estado }}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-sm text-gray-800">{{ taller.calificacion_promedio }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div *ngIf="modalAbierto" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <h3 class="text-base font-semibold text-gray-900">Nuevo Tenant</h3>
+      <button (click)="cerrarModal()" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+    </div>
+    <div class="px-6 py-5 flex flex-col gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Nombre</label>
+        <input type="text" [(ngModel)]="formTenant.nombre" placeholder="Ej: Auxilio Norte"
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Descripción</label>
+        <input type="text" [(ngModel)]="formTenant.descripcion" placeholder="Descripción de la red"
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+    </div>
+    <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
+      <button (click)="cerrarModal()"
+        class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50">
+        Cancelar
+      </button>
+      <button (click)="guardarTenant()"
+        class="px-4 py-2 text-sm text-white bg-blue-600 rounded-xl hover:bg-blue-700">
+        Guardar
+      </button>
+    </div>
+  </div>
+</div>

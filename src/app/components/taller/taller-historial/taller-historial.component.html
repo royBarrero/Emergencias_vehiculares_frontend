@@ -1,0 +1,80 @@
+<div class="p-6">
+  <h2 class="text-xl font-semibold text-gray-800 mb-6">Historial</h2>
+
+  <div *ngIf="cargando" class="text-center py-10 text-gray-400 text-sm">Cargando...</div>
+
+  <div *ngIf="!cargando && historial.length === 0"
+    class="bg-white rounded-2xl border border-gray-200 p-10 text-center text-sm text-gray-400">
+    No hay emergencias finalizadas aún
+  </div>
+
+  <div *ngIf="!cargando && historial.length > 0" class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+    <!-- Tabla historial -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <table class="w-full">
+        <thead>
+          <tr class="bg-gray-50">
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">#</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Tipo</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Técnico</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Prioridad</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of historial" (click)="verPago(e.id_emergencia)"
+            class="border-t border-gray-100 hover:bg-gray-50 cursor-pointer transition-all"
+            [class.bg-blue-50]="pagoSeleccionado?.id_emergencia === e.id_emergencia">
+            <td class="px-4 py-3 text-sm text-gray-500">{{ e.id_emergencia }}</td>
+            <td class="px-4 py-3 text-sm font-medium text-gray-800">{{ e.tipo_incidente }}</td>
+            <td class="px-4 py-3 text-sm text-gray-500">{{ e.nombre_tecnico || 'Sin asignar' }}</td>
+            <td class="px-4 py-3">
+              <span class="text-xs px-2 py-0.5 rounded-full font-semibold"
+                [style.background]="getColorPrioridad(e.prioridad) + '20'"
+                [style.color]="getColorPrioridad(e.prioridad)">
+                {{ e.prioridad }}
+              </span>
+            </td>
+            <td class="px-4 py-3 text-xs text-gray-500">{{ e.created_at | date:'dd/MM/yyyy' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Detalle pago -->
+    <div *ngIf="pagoSeleccionado" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+      <h3 class="text-base font-semibold text-gray-800 mb-4">Detalle de pago</h3>
+      <div class="flex flex-col gap-4">
+        <div class="flex justify-between items-center py-3 border-b border-gray-100">
+          <span class="text-sm text-gray-500">Monto total cobrado</span>
+          <span class="text-xl font-bold text-gray-900">Bs. {{ pagoSeleccionado.monto_total }}</span>
+        </div>
+        <div class="flex justify-between items-center py-3 border-b border-gray-100">
+          <span class="text-sm text-gray-500">Comisión plataforma (10%)</span>
+          <span class="text-base font-semibold text-red-600">- Bs. {{ pagoSeleccionado.comision }}</span>
+        </div>
+        <div class="flex justify-between items-center py-3 border-b border-gray-100">
+          <span class="text-sm font-semibold text-gray-700">Monto neto para tu taller</span>
+          <span class="text-xl font-bold text-green-600">Bs. {{ pagoSeleccionado.monto_neto }}</span>
+        </div>
+        <div class="flex justify-between items-center py-3 border-b border-gray-100">
+          <span class="text-sm text-gray-500">Método de pago</span>
+          <span class="text-sm font-semibold text-gray-800 uppercase">{{ pagoSeleccionado.metodo_pago }}</span>
+        </div>
+        <div class="flex justify-between items-center py-3">
+          <span class="text-sm text-gray-500">Estado</span>
+          <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+            {{ pagoSeleccionado.estado }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!pagoSeleccionado"
+      class="bg-white rounded-2xl border border-gray-200 shadow-sm flex items-center justify-center p-10">
+      <p class="text-sm text-gray-400">Selecciona una emergencia para ver el detalle del pago</p>
+    </div>
+
+  </div>
+</div>

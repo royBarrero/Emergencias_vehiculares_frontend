@@ -1,77 +1,125 @@
-<div class="split-container">
+<div class="min-h-screen flex">
 
   <!-- PANEL IZQUIERDO -->
-  <div class="panel-izquierdo">
-    <div class="logo">
-      <div class="logo-icono">🔧</div>
-      <span>EmergenciasVial</span>
+  <div class="hidden lg:flex lg:w-1/2 bg-gray-900 flex-col justify-between p-12">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+      </div>
+      <span class="text-white font-semibold text-lg tracking-tight">EmergenciasVial</span>
     </div>
 
-    <h1>Asistencia vehicular<br>al instante</h1>
-    <p class="descripcion">Conectamos conductores con talleres mecánicos de forma rápida, segura e inteligente.</p>
+    <div>
+      <h1 class="text-4xl font-bold text-white leading-tight mb-4">
+        Asistencia vehicular<br>al instante
+      </h1>
+      <p class="text-gray-400 text-base mb-10">
+        Conectamos conductores con talleres mecánicos de forma rápida, segura e inteligente.
+      </p>
 
-    <div class="caracteristicas">
-      <div class="caracteristica">
-        <div class="icono-caracteristica">⏱️</div>
-        <span>Respuesta en minutos</span>
-      </div>
-      <div class="caracteristica">
-        <div class="icono-caracteristica">📍</div>
-        <span>Talleres cercanos a tu ubicación</span>
-      </div>
-      <div class="caracteristica">
-        <div class="icono-caracteristica">🤖</div>
-        <span>Diagnóstico inteligente con IA</span>
+      <div class="flex flex-col gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <span class="text-gray-300 text-sm">Respuesta en minutos</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </div>
+          <span class="text-gray-300 text-sm">Talleres cercanos a tu ubicación</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+            </svg>
+          </div>
+          <span class="text-gray-300 text-sm">Diagnóstico inteligente con IA</span>
+        </div>
       </div>
     </div>
+
+    <p class="text-gray-600 text-xs">© 2025 EmergenciasVial. Todos los derechos reservados.</p>
   </div>
 
   <!-- PANEL DERECHO -->
-  <div class="panel-derecho">
-    <div class="form-container">
-      <h2>Iniciar sesión</h2>
-      <p class="subtitulo">Panel de administración</p>
+  <div class="w-full lg:w-1/2 flex items-center justify-center bg-white px-6 py-12">
+    <div class="w-full max-w-md">
 
-      <div class="form-group">
-        <label>Correo electrónico</label>
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900">Iniciar sesión</h2>
+        <p class="text-sm text-gray-500 mt-1">Panel de administración</p>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="error" class="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-600">
+        {{ error }}
+      </div>
+
+      <!-- Correo -->
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Correo electrónico</label>
         <input
           type="email"
           [(ngModel)]="correo"
           placeholder="correo@ejemplo.com"
-          class="input-field"
+          class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
         />
       </div>
 
-      <div class="form-group">
-        <label>Contraseña</label>
-        <div class="input-password">
+      <!-- Contraseña -->
+      <div class="mb-2">
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Contraseña</label>
+        <div class="relative">
           <input
             [type]="mostrarPassword ? 'text' : 'password'"
             [(ngModel)]="contrasena"
             placeholder="••••••••"
-            class="input-field"
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition pr-11"
           />
-          <span class="ojito" (click)="togglePassword()">
-            {{ mostrarPassword ? '🙈' : '👁️' }}
-          </span>
+          <button
+            type="button"
+            (click)="togglePassword()"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition">
+            <svg *ngIf="!mostrarPassword" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+            <svg *ngIf="mostrarPassword" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+            </svg>
+          </button>
         </div>
       </div>
 
-      <div class="olvidaste">
-        <a routerLink="/recuperar">¿Olvidaste tu contraseña?</a>
+      <!-- Olvidé contraseña -->
+      <div class="flex justify-end mb-6">
+        <a routerLink="/recuperar" class="text-xs text-blue-600 hover:underline">¿Olvidaste tu contraseña?</a>
       </div>
 
-      <div class="error-mensaje" *ngIf="error">
-        {{ error }}
-      </div>
-
-      <button class="btn-login" (click)="login()" [disabled]="cargando">
+      <!-- Botón -->
+      <button
+        (click)="login()"
+        [disabled]="cargando"
+        class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition">
         {{ cargando ? 'Iniciando sesión...' : 'Iniciar sesión' }}
       </button>
 
-      <p class="registro-link">
-        ¿No tienes cuenta? <a routerLink="/registro">Regístrate</a>
+      <p class="text-center text-sm text-gray-500 mt-6">
+        ¿No tienes cuenta?
+        <a routerLink="/registro" class="text-blue-600 font-medium hover:underline">Regístrate</a>
       </p>
+
     </div>
   </div>
 

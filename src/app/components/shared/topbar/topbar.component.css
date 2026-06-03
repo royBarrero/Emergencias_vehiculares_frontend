@@ -1,0 +1,82 @@
+.topbar {
+  height: 58px;
+  background: white;
+  border-bottom: 1px solid #e8ecef;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: fixed;
+  top: 0;
+  left: 220px;
+  right: 0;
+  z-index: 99;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f4f6f9;
+  border: 1px solid #e8ecef;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 12px;
+  color: #aaa;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar-username {
+  font-size: 13px;
+  color: #555;
+  font-weight: 500;
+}
+
+.topbar-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #2c3e50;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.btn-logout-top {
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid #e8ecef;
+  color: #888;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.btn-logout-top:hover {
+  background: #fff5f5;
+  color: #E53935;
+  border-color: #E53935;
+}

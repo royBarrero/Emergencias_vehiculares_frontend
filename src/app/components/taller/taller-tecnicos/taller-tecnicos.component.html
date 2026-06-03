@@ -1,0 +1,125 @@
+<div class="p-6">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-xl font-semibold text-gray-800">Mis Técnicos</h2>
+    <button (click)="abrirModal()"
+      class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all">
+      + Agregar técnico
+    </button>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+    <table class="w-full">
+      <thead>
+        <tr class="bg-gray-50">
+          <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">#</th>
+          <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Nombre</th>
+          <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Especialidad</th>
+          <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Teléfono</th>
+          <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Disponibilidad</th>
+          <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let tecnico of tecnicos" class="border-t border-gray-100 hover:bg-gray-50">
+          <td class="px-6 py-4 text-sm text-gray-500">{{ tecnico.id_tecnico }}</td>
+          <td class="px-6 py-4 text-sm font-medium text-gray-800">{{ tecnico.nombre }}</td>
+          <td class="px-6 py-4 text-sm text-gray-500">{{ tecnico.especialidad || '-' }}</td>
+          <td class="px-6 py-4 text-sm text-gray-500">{{ tecnico.telefono || '-' }}</td>
+          <td class="px-6 py-4">
+            <span [class]="tecnico.estado_disponibilidad === 'disponible' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+              class="px-3 py-1 rounded-full text-xs font-semibold">
+              {{ tecnico.estado_disponibilidad }}
+            </span>
+          </td>
+          <td class="px-6 py-4 flex items-center gap-2">
+            <button (click)="editarTecnico(tecnico)"
+              class="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-100">
+              Editar
+            </button>
+            <button (click)="eliminarTecnico(tecnico.id_tecnico)"
+              class="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="tecnicos.length === 0">
+          <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-400">No hay técnicos registrados</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div *ngIf="modalAbierto" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <h3 class="text-base font-semibold text-gray-900">{{ tecnicoEditando ? 'Editar técnico' : 'Nuevo técnico' }}</h3>
+      <button (click)="cerrarModal()" class="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+    </div>
+    <div class="px-6 py-5 flex flex-col gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Nombre</label>
+        <input type="text" [(ngModel)]="formTecnico.nombre"
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Correo</label>
+        <input type="email" [(ngModel)]="formTecnico.correo"
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+      <div>
+  <label class="block text-sm font-medium text-gray-700 mb-1.5">
+    Contraseña {{ tecnicoEditando ? '(dejar vacío para no cambiar)' : '' }}
+  </label>
+  <div class="relative">
+    <input
+      [type]="mostrarPassword ? 'text' : 'password'"
+      [(ngModel)]="formTecnico.contrasena"
+      class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 pr-11"/>
+    <button
+      type="button"
+      (click)="togglePassword()"
+      class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition">
+      <svg *ngIf="!mostrarPassword" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+      </svg>
+      <svg *ngIf="mostrarPassword" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+      </svg>
+    </button>
+  </div>
+</div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Teléfono</label>
+        <input type="text" [(ngModel)]="formTecnico.telefono"
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+      <div>
+  <label class="block text-sm font-medium text-gray-700 mb-1.5">Especialidad</label>
+  <select [(ngModel)]="formTecnico.especialidad"
+    class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+    <option value="">Seleccionar especialidad</option>
+    <option *ngFor="let esp of especialidades" [value]="esp">{{ esp }}</option>
+  </select>
+</div>
+      <div *ngIf="tecnicoEditando">
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">Disponibilidad</label>
+        <select [(ngModel)]="formTecnico.estado_disponibilidad"
+          class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="disponible">Disponible</option>
+          <option value="ocupado">Ocupado</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
+      <button (click)="cerrarModal()"
+        class="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50">Cancelar</button>
+      <button (click)="guardarTecnico()"
+        class="px-4 py-2 text-sm text-white bg-blue-600 rounded-xl hover:bg-blue-700">
+        {{ tecnicoEditando ? 'Guardar cambios' : 'Registrar' }}
+      </button>
+    </div>
+  </div>
+</div>
