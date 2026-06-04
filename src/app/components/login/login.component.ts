@@ -41,6 +41,9 @@ export class LoginComponent {
 
         // Redirigir según el rol
         switch (respuesta.id_rol) {
+          case 5:
+            this.router.navigate(['/tenant-admin']);
+            break;
           case 4:
             this.router.navigate(['/admin']);
             break;

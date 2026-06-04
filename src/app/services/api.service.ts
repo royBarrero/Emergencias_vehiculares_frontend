@@ -154,5 +154,14 @@ actualizarTenant(id: number, datos: any) {
 eliminarTenant(id: number) {
   return this.http.delete(`${this.apiUrl}/tenants/${id}`, this.getAuthHeaders());
 }
+obtenerTenantPorAdmin(id_usuario: number) {
+  return this.http.get(`${this.apiUrl}/tenants/por-admin/${id_usuario}`, this.getAuthHeaders());
+}
+obtenerTalleresPorTenant(id_tenant: number) {
+  return this.http.get(`${this.apiUrl}/tenants/${id_tenant}/talleres`, this.getAuthHeaders());
+}
+obtenerBitacoraTenant(id_tenant: number) {
+  return this.http.get(`${this.apiUrl}/bitacora/tenant/${id_tenant}`, this.getAuthHeaders());
+}
 }
 
