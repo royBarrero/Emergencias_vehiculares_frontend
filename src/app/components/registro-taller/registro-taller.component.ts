@@ -15,6 +15,8 @@ import * as L from 'leaflet';
 export class RegistroTallerComponent implements OnInit {
   paso: number = 1;
   cargando: boolean = false;
+  mostrarPassword: boolean = false;
+  mostrarConfirmar: boolean = false;
   error: string = '';
   mapa: any = null;
   marcador: any = null;
@@ -103,17 +105,31 @@ export class RegistroTallerComponent implements OnInit {
       attribution: '© OpenStreetMap'
     }).addTo(this.mapa);
 
-    this.mapa.on('click', (e: any) => {
-      const { lat, lng } = e.latlng;
-      if (this.marcador) {
-        this.marcador.setLatLng([lat, lng]);
-      } else {
-        this.marcador = L.marker([lat, lng]).addTo(this.mapa);
-      }
-      this.form.latitud = lat;
-      this.form.longitud = lng;
-      this.cdr.detectChanges();
-    });
+   this.mapa.on('click', async (e: any) => {
+  const { lat, lng } = e.latlng;
+  if (this.marcador) {
+    this.marcador.setLatLng([lat, lng]);
+  } else {
+    this.marcador = L.marker([lat, lng]).addTo(this.mapa);
+  }
+  this.form.latitud = lat;
+  this.form.longitud = lng;
+
+  // Reverse geocoding con Nominatim
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+    );
+    const data = await res.json();
+    if (data && data.display_name) {
+      this.form.direccion = data.display_name;
+    }
+  } catch {
+    // Si falla, el usuario puede escribir manualmente
+  }
+
+  this.cdr.detectChanges();
+});
   }
 
   toggleServicio(servicio: string) {
@@ -130,7 +146,13 @@ export class RegistroTallerComponent implements OnInit {
       });
     }
   }
+togglePassword() {
+  this.mostrarPassword = !this.mostrarPassword;
+}
 
+toggleConfirmar() {
+  this.mostrarConfirmar = !this.mostrarConfirmar;
+}
   servicioSeleccionado(servicio: string): boolean {
     return this.form.servicios.some((s: any) => s.nombre_servicio === servicio);
   }

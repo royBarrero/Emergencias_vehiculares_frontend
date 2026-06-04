@@ -1,0 +1,56 @@
+<!-- Stats -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+
+  <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+    <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center mb-4">
+      <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+      </svg>
+    </div>
+    <p class="text-sm text-gray-500 mb-1">Servicios</p>
+    <div class="flex items-end gap-2">
+      <h3 class="text-3xl font-bold text-gray-900">{{ pagosHistorial.length }}</h3>
+      <span class="text-xs text-gray-400 mb-1">finalizados</span>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+    <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center mb-4">
+      <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <p class="text-sm text-gray-500 mb-1">Ingresos brutos</p>
+    <div class="flex items-end gap-2">
+      <h3 class="text-2xl font-bold text-gray-900">Bs. {{ getTotalBruto() }}</h3>
+      <span class="text-xs text-gray-400 mb-1">antes de comisión</span>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+    <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center mb-4">
+      <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+      </svg>
+    </div>
+    <p class="text-sm text-gray-500 mb-1">Comisión</p>
+    <div class="flex items-end gap-2">
+      <h3 class="text-2xl font-bold text-red-600">Bs. {{ getTotalComision() }}</h3>
+      <span class="text-xs text-gray-400 mb-1">10% plataforma</span>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+    <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center mb-4">
+      <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+    <p class="text-sm text-gray-500 mb-1">Ingresos netos</p>
+    <div class="flex items-end gap-2">
+      <h3 class="text-2xl font-bold text-green-600">Bs. {{ getTotalNeto() }}</h3>
+      <span class="text-xs text-gray-400 mb-1">después de comisión</span>
+    </div>
+  </div>
+
+</div>

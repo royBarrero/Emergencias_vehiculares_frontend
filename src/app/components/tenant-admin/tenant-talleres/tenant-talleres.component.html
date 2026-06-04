@@ -1,0 +1,78 @@
+<div class="p-6">
+  <h2 class="text-xl font-semibold text-slate-800 mb-6">Mis Talleres</h2>
+
+  <div *ngIf="!tallerSeleccionado" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+    <div *ngFor="let t of talleres" (click)="verDetalle(t)"
+      class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-1 transition-all border-l-4 border-l-blue-600">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+          <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        </div>
+        <h4 class="text-base font-semibold text-slate-800">{{ t.nombre_taller }}</h4>
+      </div>
+      <p class="text-sm text-slate-500 mb-4">{{ t.direccion || 'Sin dirección' }}</p>
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-slate-500 font-medium">{{ t.calificacion_promedio }}</span>
+        <span [class]="t.estado === 'activo' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'"
+          class="px-3 py-1 rounded-full text-xs font-semibold">{{ t.estado }}</span>
+      </div>
+    </div>
+    <p *ngIf="talleres.length === 0" class="text-sm text-slate-400">No hay talleres en tu red</p>
+  </div>
+
+  <div *ngIf="tallerSeleccionado" class="bg-white rounded-xl border border-slate-100 shadow-sm">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+      <h3 class="text-base font-semibold text-slate-800">{{ tallerSeleccionado.nombre_taller }}</h3>
+      <button (click)="tallerSeleccionado = null"
+        class="text-sm text-blue-600 hover:underline font-medium">← Volver</button>
+    </div>
+    <div class="p-6">
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p class="text-xs text-slate-500 mb-1">Dirección</p>
+          <p class="text-sm font-medium text-slate-800">{{ tallerSeleccionado.direccion || '-' }}</p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p class="text-xs text-slate-500 mb-1">Teléfono</p>
+          <p class="text-sm font-medium text-slate-800">{{ tallerSeleccionado.telefono || '-' }}</p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p class="text-xs text-slate-500 mb-1">Estado</p>
+          <span [class]="tallerSeleccionado.estado === 'activo' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'"
+            class="px-3 py-1 rounded-full text-xs font-semibold">{{ tallerSeleccionado.estado }}</span>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-4">
+          <p class="text-xs text-slate-500 mb-1">Calificación</p>
+          <p class="text-sm font-medium text-slate-800">{{ tallerSeleccionado.calificacion_promedio }}</p>
+        </div>
+      </div>
+
+      <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Técnicos</h4>
+      <table class="w-full">
+        <thead>
+          <tr class="bg-slate-50 border-b border-slate-100">
+            <th class="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Nombre</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Especialidad</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Disponibilidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let tecnico of tecnicos" class="border-t border-slate-100 hover:bg-slate-50 transition-colors">
+            <td class="px-4 py-3 text-sm font-medium text-slate-800">{{ tecnico.nombre }}</td>
+            <td class="px-4 py-3 text-sm text-slate-500">{{ tecnico.especialidad || '-' }}</td>
+            <td class="px-4 py-3">
+              <span [class]="tecnico.estado_disponibilidad === 'disponible' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'"
+                class="px-3 py-1 rounded-full text-xs font-semibold">{{ tecnico.estado_disponibilidad }}</span>
+            </td>
+          </tr>
+          <tr *ngIf="tecnicos.length === 0">
+            <td colspan="3" class="px-4 py-8 text-center text-sm text-slate-400">No hay técnicos registrados</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

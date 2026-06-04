@@ -1,0 +1,32 @@
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <span class="logo-icon">🔧</span>
+      <span class="logo-text">EmergenciasVial</span>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar">{{ usuario?.nombre?.charAt(0) }}</div>
+      <div class="user-info">
+        <span class="user-name">{{ usuario?.nombre }}</span>
+        <span class="user-role">{{ usuario?.id_rol === 4 ? 'Super Admin' : 'Taller' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul>
+      <li *ngFor="let item of menuItems"
+          [class.active]="seccionActiva === item.seccion"
+          (click)="cambiarSeccion(item.seccion)">
+        <span class="nav-icon">{{ item.icon }}</span>
+        <span class="nav-label">{{ item.label }}</span>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="btn-logout" (click)="cerrarSesion()">
+      <span>🚪</span> Cerrar sesión
+    </button>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+<div class="p-6">
+  <h2 class="text-xl font-semibold text-gray-800 mb-2">Mis Servicios</h2>
+  <p class="text-sm text-gray-500 mb-6">Activa o desactiva los servicios que ofrece tu taller.</p>
+
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+    <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
+      <div *ngFor="let s of serviciosPredefinidos" (click)="toggleServicio(s)"
+        class="flex items-center gap-3 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all"
+        [class]="tieneServicio(s)
+          ? 'border-blue-500 bg-blue-50 text-blue-700'
+          : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50'">
+        <span class="text-lg">{{ tieneServicio(s) ? '✓' : '+' }}</span>
+        <span class="text-sm font-medium">{{ s }}</span>
+      </div>
+    </div>
+  </div>
+</div>

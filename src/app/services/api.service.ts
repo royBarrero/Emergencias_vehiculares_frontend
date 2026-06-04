@@ -22,11 +22,11 @@ export class ApiService {
 }
 
 obtenerTalleres() {
-  return this.http.get(`${this.apiUrl}/talleres/`);
+  return this.http.get(`${this.apiUrl}/talleres/`, this.getAuthHeaders());
 }
 
 obtenerTaller(id: number) {
-  return this.http.get(`${this.apiUrl}/talleres/${id}`);
+  return this.http.get(`${this.apiUrl}/talleres/${id}`, this.getAuthHeaders());
 }
 
 actualizarTaller(id: number, datos: any) {
@@ -133,6 +133,35 @@ obtenerPagoEmergencia(id_emergencia: number) {
   return this.http.get(`${this.apiUrl}/pagos/emergencia/${id_emergencia}`, {
     headers: { Authorization: `Bearer ${token}` }
   });
+}
+// TENANTS
+listarTenants() {
+  return this.http.get(`${this.apiUrl}/tenants/`, this.getAuthHeaders());
+}
+
+obtenerTenant(id: number) {
+  return this.http.get(`${this.apiUrl}/tenants/${id}`, this.getAuthHeaders());
+}
+
+crearTenant(datos: any) {
+  return this.http.post(`${this.apiUrl}/tenants/`, datos, this.getAuthHeaders());
+}
+
+actualizarTenant(id: number, datos: any) {
+  return this.http.patch(`${this.apiUrl}/tenants/${id}`, datos, this.getAuthHeaders());
+}
+
+eliminarTenant(id: number) {
+  return this.http.delete(`${this.apiUrl}/tenants/${id}`, this.getAuthHeaders());
+}
+obtenerTenantPorAdmin(id_usuario: number) {
+  return this.http.get(`${this.apiUrl}/tenants/por-admin/${id_usuario}`, this.getAuthHeaders());
+}
+obtenerTalleresPorTenant(id_tenant: number) {
+  return this.http.get(`${this.apiUrl}/tenants/${id_tenant}/talleres`, this.getAuthHeaders());
+}
+obtenerBitacoraTenant(id_tenant: number) {
+  return this.http.get(`${this.apiUrl}/bitacora/tenant/${id_tenant}`, this.getAuthHeaders());
 }
 }
 

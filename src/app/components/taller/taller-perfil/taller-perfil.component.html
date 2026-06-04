@@ -1,0 +1,49 @@
+<div class="p-6">
+  <h2 class="text-xl font-semibold text-gray-800 mb-6">Mi Perfil</h2>
+
+  <div *ngIf="taller" class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+
+    <!-- Header -->
+    <div class="px-6 py-8 bg-gradient-to-r from-blue-50 to-white border-b border-gray-100 flex items-center gap-5">
+      <div class="w-16 h-16 rounded-2xl bg-red-600 flex items-center justify-center text-white text-2xl font-bold">
+        {{ taller.nombre_taller?.charAt(0) }}
+      </div>
+      <div>
+        <h3 class="text-xl font-bold text-gray-900">{{ taller.nombre_taller }}</h3>
+        <span [class]="taller.estado === 'activo' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+          class="px-3 py-1 rounded-full text-xs font-semibold">
+          {{ taller.estado }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="divide-y divide-gray-100">
+      <div class="flex items-center justify-between px-6 py-4">
+        <span class="text-sm text-gray-500">Correo</span>
+        <span class="text-sm font-medium text-gray-800">{{ taller.correo || usuario?.correo || '-' }}</span>
+      </div>
+      <div class="flex items-center justify-between px-6 py-4">
+        <span class="text-sm text-gray-500">Teléfono</span>
+        <span class="text-sm font-medium text-gray-800">{{ taller.telefono || '-' }}</span>
+      </div>
+      <div class="flex items-center justify-between px-6 py-4">
+        <span class="text-sm text-gray-500">Dirección</span>
+        <span class="text-sm font-medium text-gray-800">{{ taller.direccion || '-' }}</span>
+      </div>
+      <div class="flex items-center justify-between px-6 py-4">
+        <span class="text-sm text-gray-500">Descripción</span>
+        <span class="text-sm font-medium text-gray-800">{{ taller.descripcion || '-' }}</span>
+      </div>
+      <div class="flex items-center justify-between px-6 py-4">
+        <span class="text-sm text-gray-500">Calificación promedio</span>
+        <span class="text-sm font-bold text-yellow-500">⭐ {{ taller.calificacion_promedio }}</span>
+      </div>
+      <div class="flex items-center justify-between px-6 py-4">
+        <span class="text-sm text-gray-500">Tenant</span>
+        <span class="text-sm font-medium text-gray-800">{{ taller.id_tenant || '-' }}</span>
+      </div>
+    </div>
+
+  </div>
+</div>

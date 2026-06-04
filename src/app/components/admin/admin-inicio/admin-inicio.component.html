@@ -1,0 +1,85 @@
+<div class="p-6">
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-6">
+
+  <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center mb-4">
+      <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+      </svg>
+    </div>
+    <p class="text-sm text-gray-500 mb-1">Tenants</p>
+    <div class="flex items-end gap-2">
+      <h3 class="text-3xl font-bold text-gray-900">{{ tenants.length }}</h3>
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-amber-100 bg-amber-50 p-5 shadow-sm">
+    <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center mb-4">
+      <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+      </svg>
+    </div>
+    <p class="text-sm text-amber-700 mb-1">Talleres</p>
+    <div class="flex items-end gap-2">
+      <h3 class="text-3xl font-bold text-amber-600">{{ estadisticas.talleres }}</h3>
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-emerald-100 bg-emerald-50 p-5 shadow-sm">
+    <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center mb-4">
+      <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+      </svg>
+    </div>
+    <p class="text-sm text-emerald-700 mb-1">Técnicos</p>
+    <div class="flex items-end gap-2">
+      <h3 class="text-3xl font-bold text-emerald-600">{{ estadisticas.tecnicos }}</h3>
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-blue-100 bg-blue-50 p-5 shadow-sm">
+    <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center mb-4">
+      <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+      </svg>
+    </div>
+    <p class="text-sm text-blue-700 mb-1">Conductores</p>
+    <div class="flex items-end gap-2">
+      <h3 class="text-3xl font-bold text-blue-600">{{ estadisticas.conductores }}</h3>
+    </div>
+  </div>
+
+</div>
+
+  <!-- Tenants Table -->
+  <div class="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h3 class="text-base font-semibold text-gray-800">Tenants registrados</h3>
+    </div>
+    <table class="w-full">
+      <thead>
+        <tr class="bg-gray-50">
+          <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Nombre</th>
+          <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Descripción</th>
+          <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Talleres</th>
+          <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let tenant of tenants" class="border-t border-gray-100 hover:bg-gray-50">
+          <td class="px-6 py-4 text-sm font-medium text-gray-800">{{ tenant.nombre }}</td>
+          <td class="px-6 py-4 text-sm text-gray-500">{{ tenant.descripcion }}</td>
+          <td class="px-6 py-4 text-sm text-gray-800">{{ tenant.total_talleres }}</td>
+          <td class="px-6 py-4">
+            <span [class]="tenant.estado ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+              class="px-3 py-1 rounded-full text-xs font-semibold">
+              {{ tenant.estado ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

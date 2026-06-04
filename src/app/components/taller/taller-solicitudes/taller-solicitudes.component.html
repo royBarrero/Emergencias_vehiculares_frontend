@@ -1,0 +1,153 @@
+<div class="p-6">
+  <h2 class="text-xl font-semibold text-gray-800 mb-6">Solicitudes</h2>
+
+  <!-- Tabs -->
+  <div class="flex gap-2 mb-6">
+    <button (click)="tabActiva = 'pendientes'"
+      [class]="tabActiva === 'pendientes' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border border-gray-200'"
+      class="px-4 py-2 rounded-xl text-sm font-medium transition-all">
+      Pendientes
+      <span class="ml-2 px-2 py-0.5 rounded-full text-xs"
+        [class]="tabActiva === 'pendientes' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'">
+        {{ emergenciasPendientes.length }}
+      </span>
+    </button>
+    <button (click)="tabActiva = 'asignadas'"
+      [class]="tabActiva === 'asignadas' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border border-gray-200'"
+      class="px-4 py-2 rounded-xl text-sm font-medium transition-all">
+      Mis emergencias
+      <span class="ml-2 px-2 py-0.5 rounded-full text-xs"
+        [class]="tabActiva === 'asignadas' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'">
+        {{ emergenciasTaller.length }}
+      </span>
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+    <!-- Lista -->
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h3 class="text-sm font-semibold text-gray-700">
+          {{ tabActiva === 'pendientes' ? 'Emergencias disponibles' : 'Emergencias de tu taller' }}
+        </h3>
+      </div>
+      <div class="divide-y divide-gray-100">
+
+        <!-- Pendientes -->
+        <ng-container *ngIf="tabActiva === 'pendientes'">
+          <div *ngFor="let e of emergenciasPendientes" (click)="verDetalle(e)"
+            class="px-6 py-4 hover:bg-gray-50 cursor-pointer transition-all"
+            [class.bg-blue-50]="emergenciaSeleccionada?.id_emergencia === e.id_emergencia">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm font-medium text-gray-800">{{ e.tipo_incidente }}</span>
+              <span class="text-xs px-2 py-0.5 rounded-full font-semibold"
+                [style.background]="getColorPrioridad(e.prioridad) + '20'"
+                [style.color]="getColorPrioridad(e.prioridad)">
+                {{ e.prioridad }}
+              </span>
+            </div>
+            <p class="text-xs text-gray-500">{{ e.direccion_aproximada || 'Sin dirección' }}</p>
+          </div>
+          <p *ngIf="emergenciasPendientes.length === 0"
+            class="px-6 py-8 text-center text-sm text-gray-400">
+            No hay emergencias pendientes
+          </p>
+        </ng-container>
+
+        <!-- Asignadas -->
+        <ng-container *ngIf="tabActiva === 'asignadas'">
+          <div *ngFor="let e of emergenciasTaller" (click)="verDetalle(e)"
+            class="px-6 py-4 hover:bg-gray-50 cursor-pointer transition-all"
+            [class.bg-blue-50]="emergenciaSeleccionada?.id_emergencia === e.id_emergencia">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm font-medium text-gray-800">{{ e.tipo_incidente }}</span>
+              <span class="text-xs px-2 py-0.5 rounded-full font-semibold"
+                [style.background]="getColorEstado(e.estado) + '20'"
+                [style.color]="getColorEstado(e.estado)">
+                {{ e.estado }}
+              </span>
+            </div>
+            <p class="text-xs text-gray-500">{{ e.nombre_tecnico || 'Sin técnico asignado' }}</p>
+          </div>
+          <p *ngIf="emergenciasTaller.length === 0"
+            class="px-6 py-8 text-center text-sm text-gray-400">
+            No hay emergencias asignadas
+          </p>
+        </ng-container>
+
+      </div>
+    </div>
+
+    <!-- Detalle -->
+    <div *ngIf="emergenciaSeleccionada" class="bg-white rounded-2xl border border-gray-200 shadow-sm">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <h3 class="text-sm font-semibold text-gray-700">Detalle de emergencia</h3>
+        <button (click)="cerrarDetalle()" class="text-gray-400 hover:text-gray-600 text-lg">✕</button>
+      </div>
+      <div class="p-6 flex flex-col gap-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-gray-50 rounded-xl p-3">
+            <p class="text-xs text-gray-500 mb-1">Tipo</p>
+            <p class="text-sm font-semibold text-gray-800">{{ emergenciaSeleccionada.tipo_incidente }}</p>
+          </div>
+          <div class="bg-gray-50 rounded-xl p-3">
+            <p class="text-xs text-gray-500 mb-1">Prioridad</p>
+            <p class="text-sm font-semibold" [style.color]="getColorPrioridad(emergenciaSeleccionada.prioridad)">
+              {{ emergenciaSeleccionada.prioridad }}
+            </p>
+          </div>
+          <div class="bg-gray-50 rounded-xl p-3">
+            <p class="text-xs text-gray-500 mb-1">Estado</p>
+            <p class="text-sm font-semibold" [style.color]="getColorEstado(emergenciaSeleccionada.estado)">
+              {{ emergenciaSeleccionada.estado }}
+            </p>
+          </div>
+          <div class="bg-gray-50 rounded-xl p-3">
+            <p class="text-xs text-gray-500 mb-1">Dirección</p>
+            <p class="text-sm font-semibold text-gray-800">{{ emergenciaSeleccionada.direccion_aproximada || '-' }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="emergenciaSeleccionada.descripcion" class="bg-gray-50 rounded-xl p-3">
+          <p class="text-xs text-gray-500 mb-1">Descripción</p>
+          <p class="text-sm text-gray-700">{{ emergenciaSeleccionada.descripcion }}</p>
+        </div>
+
+        <!-- Acciones según estado -->
+        <div *ngIf="emergenciaSeleccionada.estado === 'pendiente'" class="flex gap-3 pt-2">
+          <button (click)="aceptarEmergencia()"
+            class="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2.5 rounded-xl transition-all">
+            ✓ Aceptar
+          </button>
+          <button (click)="rechazarEmergencia()"
+            class="flex-1 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-medium py-2.5 rounded-xl transition-all">
+            ✕ Rechazar
+          </button>
+        </div>
+
+        <!-- Asignar técnico -->
+        <div *ngIf="emergenciaSeleccionada.estado === 'asignada'" class="flex flex-col gap-3 pt-2">
+          <select [(ngModel)]="idTecnicoSeleccionado"
+            class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option [ngValue]="null">Seleccionar técnico</option>
+            <option *ngFor="let t of tecnicos" [value]="t.id_tecnico">
+              {{ t.nombre }} — {{ t.especialidad }}
+            </option>
+          </select>
+          <button (click)="asignarTecnico()" [disabled]="!idTecnicoSeleccionado"
+            class="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium py-2.5 rounded-xl transition-all">
+            Asignar técnico
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <div *ngIf="!emergenciaSeleccionada"
+      class="bg-white rounded-2xl border border-gray-200 shadow-sm flex items-center justify-center p-10">
+      <p class="text-sm text-gray-400">Selecciona una emergencia para ver el detalle</p>
+    </div>
+
+  </div>
+</div>
