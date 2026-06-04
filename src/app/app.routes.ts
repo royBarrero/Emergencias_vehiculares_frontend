@@ -21,6 +21,7 @@ import { TenantInicioComponent } from './components/tenant-admin/tenant-inicio/t
 import { TenantTalleresComponent } from './components/tenant-admin/tenant-talleres/tenant-talleres.component';
 import { TenantReportesComponent } from './components/tenant-admin/tenant-reportes/tenant-reportes.component';
 import { TenantBitacoraComponent } from './components/tenant-admin/tenant-bitacora/tenant-bitacora.component';
+import { AdminBitacoraComponent } from './components/admin/admin-bitacora/admin-bitacora.component';
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -32,7 +33,8 @@ export const routes: Routes = [
       { path: '', redirectTo: 'inicio', pathMatch: 'full' },
       { path: 'inicio', component: AdminInicioComponent },
       { path: 'tenants', component: AdminTenantsComponent },
-      { path: 'talleres', component: AdminTalleresComponent }
+      { path: 'talleres', component: AdminTalleresComponent },
+      { path: 'bitacora', component: AdminBitacoraComponent },
     ]
   },
   {
