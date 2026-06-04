@@ -1,6 +1,16 @@
 <div class="p-6">
-  <h2 class="text-xl font-semibold text-slate-800 mb-6">Mis Talleres</h2>
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-xl font-semibold text-slate-800">Mis Talleres</h2>
+    <button *ngIf="!tallerSeleccionado" (click)="abrirModalNuevo()"
+      class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Nuevo Taller
+    </button>
+  </div>
 
+  <!-- Grid talleres -->
   <div *ngIf="!tallerSeleccionado" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
     <div *ngFor="let t of talleres" (click)="verDetalle(t)"
       class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-1 transition-all border-l-4 border-l-blue-600">
@@ -15,7 +25,7 @@
       </div>
       <p class="text-sm text-slate-500 mb-4">{{ t.direccion || 'Sin dirección' }}</p>
       <div class="flex items-center justify-between">
-        <span class="text-sm text-slate-500 font-medium">{{ t.calificacion_promedio }}</span>
+        <span class="text-sm font-medium text-slate-600">{{ t.calificacion_promedio }}</span>
         <span [class]="t.estado === 'activo' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'"
           class="px-3 py-1 rounded-full text-xs font-semibold">{{ t.estado }}</span>
       </div>
@@ -23,12 +33,24 @@
     <p *ngIf="talleres.length === 0" class="text-sm text-slate-400">No hay talleres en tu red</p>
   </div>
 
+  <!-- Detalle taller -->
   <div *ngIf="tallerSeleccionado" class="bg-white rounded-xl border border-slate-100 shadow-sm">
     <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
       <h3 class="text-base font-semibold text-slate-800">{{ tallerSeleccionado.nombre_taller }}</h3>
-      <button (click)="tallerSeleccionado = null"
-        class="text-sm text-blue-600 hover:underline font-medium">← Volver</button>
+      <div class="flex items-center gap-3">
+        <button (click)="abrirModalEditar()"
+          class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition-all">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          Editar
+        </button>
+        <button (click)="tallerSeleccionado = null"
+          class="text-sm text-blue-600 hover:underline font-medium">← Volver</button>
+      </div>
     </div>
+
     <div class="p-6">
       <div class="grid grid-cols-2 gap-4 mb-6">
         <div class="bg-slate-50 rounded-xl p-4">
@@ -47,6 +69,19 @@
         <div class="bg-slate-50 rounded-xl p-4">
           <p class="text-xs text-slate-500 mb-1">Calificación</p>
           <p class="text-sm font-medium text-slate-800">{{ tallerSeleccionado.calificacion_promedio }}</p>
+        </div>
+      </div>
+
+      <div class="bg-blue-50 rounded-xl p-4 mb-6 border border-blue-100">
+        <p class="text-xs text-blue-600 font-semibold uppercase tracking-wide mb-2">Encargado del taller</p>
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm">
+            {{ tallerSeleccionado.encargado?.nombre?.charAt(0) }}
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-slate-800">{{ tallerSeleccionado.encargado?.nombre }}</p>
+            <p class="text-xs text-slate-500">{{ tallerSeleccionado.encargado?.correo }}</p>
+          </div>
         </div>
       </div>
 
@@ -73,6 +108,163 @@
           </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EDITAR -->
+<div *ngIf="modalEditarAbierto" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+      <h3 class="text-base font-semibold text-slate-900">Editar taller</h3>
+      <button (click)="modalEditarAbierto = false" class="text-slate-400 hover:text-slate-600 text-xl">✕</button>
+    </div>
+    <div class="px-6 py-5 flex flex-col gap-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Nombre</label>
+        <input type="text" [(ngModel)]="formEditar.nombre_taller"
+          class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Dirección</label>
+        <input type="text" [(ngModel)]="formEditar.direccion"
+          class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Teléfono</label>
+        <input type="text" [(ngModel)]="formEditar.telefono"
+          class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Descripción</label>
+        <input type="text" [(ngModel)]="formEditar.descripcion"
+          class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Estado</label>
+        <select [(ngModel)]="formEditar.estado"
+          class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="activo">Activo</option>
+          <option value="inactivo">Inactivo</option>
+          <option value="pendiente">Pendiente</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex justify-end gap-3 px-6 py-4 border-t border-slate-100">
+      <button (click)="modalEditarAbierto = false"
+        class="px-4 py-2 text-sm text-slate-600 border border-gray-200 rounded-xl hover:bg-slate-50">Cancelar</button>
+      <button (click)="guardarEditar()"
+        class="px-4 py-2 text-sm text-white bg-blue-600 rounded-xl hover:bg-blue-700">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NUEVO TALLER -->
+<div *ngIf="modalNuevoAbierto" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+  <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+      <h3 class="text-base font-semibold text-slate-900">Nuevo Taller</h3>
+      <button (click)="cerrarModalNuevo()" class="text-slate-400 hover:text-slate-600 text-xl">✕</button>
+    </div>
+    <div class="px-6 py-5 flex flex-col gap-4">
+
+      <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Datos del taller</p>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Nombre del taller</label>
+        <input type="text" [(ngModel)]="formNuevo.nombre_taller"
+          class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Teléfono</label>
+        <input type="text" [(ngModel)]="formNuevo.telefono"
+          class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+
+      <!-- Mapa -->
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Ubicación en el mapa</label>
+        <div id="mapa-nuevo-taller" style="height: 220px; width: 100%; z-index: 1;"></div>
+        <div *ngIf="formNuevo.latitud" class="mt-2 flex items-center gap-1.5 text-xs text-blue-600">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          {{ formNuevo.direccion }}
+        </div>
+        <p *ngIf="!formNuevo.latitud" class="mt-2 text-xs text-slate-400">Toca el mapa para marcar la ubicación</p>
+      </div>
+
+      <!-- Servicios desplegable -->
+      <div>
+        <button type="button" (click)="serviciosExpandido = !serviciosExpandido"
+          class="w-full flex items-center justify-between px-4 py-2.5 border border-gray-200 rounded-xl text-sm text-slate-700 hover:bg-slate-50 transition-all">
+          <span>Servicios seleccionados: <strong>{{ formNuevo.servicios.length }}</strong></span>
+          <svg class="w-4 h-4 transition-transform" [class.rotate-180]="serviciosExpandido"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div *ngIf="serviciosExpandido" class="mt-2 grid grid-cols-2 gap-2">
+          <div *ngFor="let s of serviciosPredefinidos" (click)="toggleServicio(s)"
+            class="flex items-center gap-2 px-3 py-2 rounded-xl border-2 cursor-pointer transition-all text-sm"
+            [class]="tieneServicio(s) ? 'border-blue-500 bg-blue-50 text-blue-700 font-medium' : 'border-gray-200 text-slate-600 hover:border-gray-300'">
+            <svg *ngIf="tieneServicio(s)" class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            <svg *ngIf="!tieneServicio(s)" class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            {{ s }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Administrador -->
+      <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Administrador</p>
+      <div class="flex items-center gap-3">
+        <button type="button" (click)="usarAdminExistente = false"
+          [class]="!usarAdminExistente ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'"
+          class="px-4 py-2 rounded-xl text-sm font-medium transition-all">Crear nuevo</button>
+        <button type="button" (click)="usarAdminExistente = true"
+          [class]="usarAdminExistente ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'"
+          class="px-4 py-2 rounded-xl text-sm font-medium transition-all">Usar existente</button>
+      </div>
+
+      <div *ngIf="usarAdminExistente">
+        <label class="block text-sm font-medium text-slate-700 mb-1.5">Correo del usuario existente</label>
+        <input type="email" [(ngModel)]="formNuevo.correo_existente"
+          class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+      </div>
+
+      <div *ngIf="!usarAdminExistente" class="flex flex-col gap-3">
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Nombre</label>
+          <input type="text" [(ngModel)]="formNuevo.nombre_admin"
+            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Correo</label>
+          <input type="email" [(ngModel)]="formNuevo.correo_admin"
+            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Contraseña</label>
+          <input type="password" [(ngModel)]="formNuevo.contrasena_admin"
+            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Teléfono</label>
+          <input type="text" [(ngModel)]="formNuevo.telefono_admin"
+            class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+        </div>
+      </div>
+
+    </div>
+    <div class="flex justify-end gap-3 px-6 py-4 border-t border-slate-100">
+      <button type="button" (click)="cerrarModalNuevo()"
+        class="px-4 py-2 text-sm text-slate-600 border border-gray-200 rounded-xl hover:bg-slate-50">Cancelar</button>
+      <button type="button" (click)="guardarNuevo()"
+        class="px-4 py-2 text-sm text-white bg-blue-600 rounded-xl hover:bg-blue-700">Crear taller</button>
     </div>
   </div>
 </div>

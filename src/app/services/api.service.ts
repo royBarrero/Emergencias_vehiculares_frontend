@@ -163,5 +163,16 @@ obtenerTalleresPorTenant(id_tenant: number) {
 obtenerBitacoraTenant(id_tenant: number) {
   return this.http.get(`${this.apiUrl}/bitacora/tenant/${id_tenant}`, this.getAuthHeaders());
 }
+detalleTallerTenant(id_tenant: number, id_taller: number) {
+  return this.http.get(`${this.apiUrl}/tenants/${id_tenant}/talleres/${id_taller}/detalle`, this.getAuthHeaders());
+}
+
+editarTallerTenant(id_tenant: number, id_taller: number, datos: any) {
+  return this.http.patch(`${this.apiUrl}/tenants/${id_tenant}/talleres/${id_taller}`, datos, this.getAuthHeaders());
+}
+
+crearTallerTenant(id_tenant: number, datos: any) {
+  return this.http.post(`${this.apiUrl}/tenants/${id_tenant}/talleres`, datos, this.getAuthHeaders());
+}
 }
 
