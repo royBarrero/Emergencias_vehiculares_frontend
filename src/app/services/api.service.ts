@@ -160,6 +160,18 @@ obtenerTenantPorAdmin(id_usuario: number) {
 obtenerTalleresPorTenant(id_tenant: number) {
   return this.http.get(`${this.apiUrl}/tenants/${id_tenant}/talleres`, this.getAuthHeaders());
 }
+// COTIZACIONES
+obtenerCotizacionesTaller(id_taller: number) {
+  return this.http.get(`${this.apiUrl}/cotizaciones/taller/${id_taller}`, this.getAuthHeaders());
+}
+
+obtenerCotizacionEmergencia(id_emergencia: number) {
+  return this.http.get(`${this.apiUrl}/cotizaciones/emergencia/${id_emergencia}`, this.getAuthHeaders());
+}
+
+responderCotizacion(id_cotizacion: number, datos: any) {
+  return this.http.put(`${this.apiUrl}/cotizaciones/${id_cotizacion}/responder`, datos, this.getAuthHeaders());
+}
 obtenerBitacoraTenant(id_tenant: number) {
   return this.http.get(`${this.apiUrl}/bitacora/tenant/${id_tenant}`, this.getAuthHeaders());
 }

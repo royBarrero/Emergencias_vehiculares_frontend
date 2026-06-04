@@ -21,6 +21,17 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
   idTecnicoSeleccionado: number | null = null;
   private intervalo: any;
 
+  // Cotización
+  cotizacionActual: any = null;
+  mostrarFormCotizacion: boolean = false;
+  enviandoCotizacion: boolean = false;
+  formCotizacion = {
+    monto_estimado: null as number | null,
+    descripcion_servicio: '',
+    tiempo_estimado: '',
+    observacion: ''
+  };
+
   constructor(
     private api: ApiService,
     private cdr: ChangeDetectorRef,
@@ -77,8 +88,54 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
         this.ngZone.run(() => {
           this.emergenciaSeleccionada = data;
           this.idTecnicoSeleccionado = null;
+          this.cotizacionActual = null;
+          this.mostrarFormCotizacion = false;
+          this.cargarCotizacion(data.id_emergencia);
           this.cdr.detectChanges();
         });
+      }
+    });
+  }
+
+  cargarCotizacion(id_emergencia: number) {
+    this.api.obtenerCotizacionEmergencia(id_emergencia).subscribe({
+      next: (data: any) => {
+        this.ngZone.run(() => {
+          this.cotizacionActual = data;
+          this.cdr.detectChanges();
+        });
+      },
+      error: () => {
+        this.cotizacionActual = null;
+      }
+    });
+  }
+
+  abrirFormCotizacion() {
+    this.formCotizacion = {
+      monto_estimado: null,
+      descripcion_servicio: '',
+      tiempo_estimado: '',
+      observacion: ''
+    };
+    this.mostrarFormCotizacion = true;
+  }
+
+  enviarCotizacion() {
+    if (!this.cotizacionActual || !this.formCotizacion.monto_estimado ||
+        !this.formCotizacion.descripcion_servicio || !this.formCotizacion.tiempo_estimado) return;
+    this.enviandoCotizacion = true;
+    this.api.responderCotizacion(this.cotizacionActual.id_cotizacion, this.formCotizacion).subscribe({
+      next: (data: any) => {
+        this.ngZone.run(() => {
+          this.cotizacionActual = data;
+          this.mostrarFormCotizacion = false;
+          this.enviandoCotizacion = false;
+          this.cdr.detectChanges();
+        });
+      },
+      error: () => {
+        this.enviandoCotizacion = false;
       }
     });
   }
@@ -132,6 +189,8 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
 
   cerrarDetalle() {
     this.emergenciaSeleccionada = null;
+    this.cotizacionActual = null;
+    this.mostrarFormCotizacion = false;
   }
 
   getColorPrioridad(prioridad: string): string {
@@ -147,6 +206,16 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
       atendiendo: '#d97706',
       finalizada: '#16a34a',
       cancelada: '#dc2626'
+    };
+    return colores[estado] || '#6b7280';
+  }
+
+  getColorCotizacion(estado: string): string {
+    const colores: any = {
+      solicitada: '#d97706',
+      enviada: '#2563eb',
+      aceptada: '#16a34a',
+      rechazada: '#dc2626'
     };
     return colores[estado] || '#6b7280';
   }
