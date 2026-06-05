@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-
+import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 @Injectable({
   providedIn: 'root'
 })
@@ -177,6 +177,42 @@ editarTallerTenant(id_tenant: number, id_taller: number, datos: any) {
 crearTallerTenant(id_tenant: number, datos: any) {
   return this.http.post(`${this.apiUrl}/tenants/${id_tenant}/talleres`, datos, this.getAuthHeaders());
 }
+private wsSubjects: Map<number, WebSocketSubject<any>> = new Map();
 
+conectarEmergenciaWS(id_emergencia: number): WebSocketSubject<any> {
+  if (!this.wsSubjects.has(id_emergencia)) {
+    const wsUrl = this.apiUrl.replace('http', 'ws') + `/ws/emergencia/${id_emergencia}`;
+    const subject = webSocket({
+      url: wsUrl,
+      openObserver: {
+        next: () => console.log(`WS conectado: emergencia ${id_emergencia}`)
+      },
+      closeObserver: {
+        next: () => {
+          console.log(`WS desconectado: emergencia ${id_emergencia}`);
+          this.wsSubjects.delete(id_emergencia);
+        }
+      }
+    });
+    this.wsSubjects.set(id_emergencia, subject);
+  }
+  return this.wsSubjects.get(id_emergencia)!;
+}
+
+desconectarEmergenciaWS(id_emergencia: number) {
+  if (this.wsSubjects.has(id_emergencia)) {
+    this.wsSubjects.get(id_emergencia)!.complete();
+    this.wsSubjects.delete(id_emergencia);
+  }
+}
+conectarTallerWS(id_taller: number): WebSocketSubject<any> {
+  const wsUrl = this.apiUrl.replace('http', 'ws') + `/ws/taller/${id_taller}`;
+  return webSocket({
+    url: wsUrl,
+    openObserver: {
+      next: () => console.log(`WS taller ${id_taller} conectado`)
+    }
+  });
+}
 }
 

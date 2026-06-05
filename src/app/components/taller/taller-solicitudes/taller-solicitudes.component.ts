@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angula
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-taller-solicitudes',
@@ -19,7 +20,8 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
   tabActiva: string = 'pendientes';
   cargando: boolean = false;
   idTecnicoSeleccionado: number | null = null;
-  private intervalo: any;
+  private wsSubscriptions: Map<number, Subscription> = new Map();
+  private wsTallerSub: Subscription | null = null;
 
   constructor(
     private api: ApiService,
@@ -33,12 +35,68 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
       this.taller = JSON.parse(data);
       this.cargarEmergencias();
       this.cargarTecnicos();
-      this.intervalo = setInterval(() => this.cargarEmergencias(), 15000);
+      this.conectarWSTaller();
     }
   }
 
   ngOnDestroy() {
-    if (this.intervalo) clearInterval(this.intervalo);
+    this.wsSubscriptions.forEach((sub, id) => {
+      if (this.wsTallerSub) this.wsTallerSub.unsubscribe();
+      sub.unsubscribe();
+      this.api.desconectarEmergenciaWS(id);
+    });
+  }
+
+  conectarWS(id_emergencia: number) {
+    if (this.wsSubscriptions.has(id_emergencia)) return;
+    const sub = this.api.conectarEmergenciaWS(id_emergencia).subscribe({
+      next: (msg: any) => {
+        this.ngZone.run(() => {
+          console.log('WS mensaje:', msg);
+          if (msg.tipo === 'cambio_estado') {
+            this.actualizarEmergenciaLocal(msg);
+          }
+          this.cdr.detectChanges();
+        });
+      },
+      error: () => {
+        this.wsSubscriptions.delete(id_emergencia);
+      }
+    });
+    this.wsSubscriptions.set(id_emergencia, sub);
+  }
+conectarWSTaller() {
+  this.wsTallerSub = this.api.conectarTallerWS(this.taller.id_taller).subscribe({
+    next: (msg: any) => {
+      this.ngZone.run(() => {
+        if (msg.tipo === 'nueva_emergencia') {
+          this.cargarEmergencias();
+        }
+        this.cdr.detectChanges();
+      });
+    },
+    error: () => {
+      setTimeout(() => this.conectarWSTaller(), 3000);
+    }
+  });
+}
+  actualizarEmergenciaLocal(msg: any) {
+    // Actualizar en lista de emergencias del taller
+    const idx = this.emergenciasTaller.findIndex(e => e.id_emergencia === msg.id_emergencia);
+    if (idx !== -1) {
+      this.emergenciasTaller[idx].estado = msg.estado;
+    }
+    // Actualizar detalle si está abierto
+    if (this.emergenciaSeleccionada?.id_emergencia === msg.id_emergencia) {
+      this.emergenciaSeleccionada.estado = msg.estado;
+    }
+    // Si la emergencia finalizó o canceló, desconectar WS
+    if (['finalizada', 'cancelada'].includes(msg.estado)) {
+      const sub = this.wsSubscriptions.get(msg.id_emergencia);
+      if (sub) sub.unsubscribe();
+      this.wsSubscriptions.delete(msg.id_emergencia);
+      this.api.desconectarEmergenciaWS(msg.id_emergencia);
+    }
   }
 
   cargarEmergencias() {
@@ -54,6 +112,12 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
       next: (data: any) => {
         this.ngZone.run(() => {
           this.emergenciasTaller = data;
+          // Conectar WS a emergencias activas
+          data.forEach((e: any) => {
+            if (!['finalizada', 'cancelada'].includes(e.estado)) {
+              this.conectarWS(e.id_emergencia);
+            }
+          });
           this.cdr.detectChanges();
         });
       }
@@ -77,6 +141,7 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
         this.ngZone.run(() => {
           this.emergenciaSeleccionada = data;
           this.idTecnicoSeleccionado = null;
+          this.conectarWS(data.id_emergencia);
           this.cdr.detectChanges();
         });
       }
