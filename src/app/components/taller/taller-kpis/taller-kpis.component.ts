@@ -32,13 +32,13 @@ export class TallerKpisComponent implements OnInit {
     private ngZone: NgZone
   ) {}
 
-  ngOnInit() {
-    const data = localStorage.getItem('taller');
-    if (data) {
-      this.taller = JSON.parse(data);
-      this.cargarKpis();
+    ngOnInit() {
+      const data = localStorage.getItem('taller');
+      if (data) {
+        this.taller = JSON.parse(data);
+        this.cargarKpis();
+      }
     }
-  }
 
   cargarKpis() {
     this.cargando = true;

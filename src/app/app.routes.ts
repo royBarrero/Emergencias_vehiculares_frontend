@@ -6,6 +6,7 @@ import { AdminInicioComponent } from './components/admin/admin-inicio/admin-inic
 import { AdminTenantsComponent } from './components/admin/admin-tenants/admin-tenants.component';
 import { TallerLayoutComponent } from './components/taller/taller-layout/taller-layout.component';
 import { AdminTalleresComponent } from './components/admin/admin-talleres/admin-talleres.component';
+import { AdminMapaComponent } from './components/admin/admin-mapa/admin-mapa.component';
 
 import { TallerInicioComponent } from './components/taller/taller-inicio/taller-inicio.component';
 import { TallerSolicitudesComponent } from './components/taller/taller-solicitudes/taller-solicitudes.component';
@@ -24,6 +25,7 @@ import { TenantBitacoraComponent } from './components/tenant-admin/tenant-bitaco
 import { AdminBitacoraComponent } from './components/admin/admin-bitacora/admin-bitacora.component';
 import { TallerKpisComponent } from './components/taller/taller-kpis/taller-kpis.component';
 import { AdminKpisComponent } from './components/admin/admin-kpis/admin-kpis.component';
+import { TenantMapaComponent } from './components/tenant-admin/tenant-mapa/tenant-mapa.component';
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -37,7 +39,8 @@ export const routes: Routes = [
       { path: 'tenants', component: AdminTenantsComponent },
       { path: 'talleres', component: AdminTalleresComponent },
       { path: 'bitacora', component: AdminBitacoraComponent },
-      { path: 'kpis', component: AdminKpisComponent }
+      { path: 'kpis', component: AdminKpisComponent },
+      { path: 'mapa', component: AdminMapaComponent }
     ]
   },
   {
@@ -63,7 +66,8 @@ export const routes: Routes = [
     { path: 'inicio', component: TenantInicioComponent },
     { path: 'talleres', component: TenantTalleresComponent },
     { path: 'reportes', component: TenantReportesComponent },
-{ path: 'bitacora', component: TenantBitacoraComponent },
+    { path: 'bitacora', component: TenantBitacoraComponent },
+    { path: 'mapa', component: TenantMapaComponent }
   ]
 },
   { path: '**', redirectTo: 'login' }

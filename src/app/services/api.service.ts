@@ -240,5 +240,24 @@ obtenerKpisTenant(id_tenant: number, params?: any) {
   if (p.toString()) url += `?${p.toString()}`;
   return this.http.get(url, this.getAuthHeaders());
 }
+obtenerGeoTenant(id_tenant: number, params?: any) {
+  let url = `${this.apiUrl}/kpis/geo/tenant/${id_tenant}`;
+  const p = new URLSearchParams();
+  if (params?.fecha_inicio) p.append('fecha_inicio', params.fecha_inicio);
+  if (params?.fecha_fin) p.append('fecha_fin', params.fecha_fin);
+  if (params?.tipo_incidente) p.append('tipo_incidente', params.tipo_incidente);
+  if (p.toString()) url += `?${p.toString()}`;
+  return this.http.get(url, this.getAuthHeaders());
+}
+
+obtenerGeoAdmin(params?: any) {
+  let url = `${this.apiUrl}/kpis/geo/admin`;
+  const p = new URLSearchParams();
+  if (params?.fecha_inicio) p.append('fecha_inicio', params.fecha_inicio);
+  if (params?.fecha_fin) p.append('fecha_fin', params.fecha_fin);
+  if (params?.tipo_incidente) p.append('tipo_incidente', params.tipo_incidente);
+  if (p.toString()) url += `?${p.toString()}`;
+  return this.http.get(url, this.getAuthHeaders());
+}
 }
 

@@ -30,14 +30,28 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    const data = localStorage.getItem('taller');
-    if (data) {
-      this.taller = JSON.parse(data);
-      this.cargarEmergencias();
-      this.cargarTecnicos();
-      this.conectarWSTaller();
-    }
+  const data = localStorage.getItem('taller');
+  if (data) {
+    this.taller = JSON.parse(data);
+    this.cargarEmergencias();
+    this.cargarTecnicos();
+    this.conectarWSTaller();
+  } else {
+    const intervalo = setInterval(() => {
+      const retry = localStorage.getItem('taller');
+      if (retry) {
+        clearInterval(intervalo);
+        this.taller = JSON.parse(retry);
+        this.ngZone.run(() => {
+          this.cargarEmergencias();
+          this.cargarTecnicos();
+          this.conectarWSTaller();
+          this.cdr.detectChanges();
+        });
+      }
+    }, 300);
   }
+}
 
   ngOnDestroy() {
     this.wsSubscriptions.forEach((sub, id) => {
