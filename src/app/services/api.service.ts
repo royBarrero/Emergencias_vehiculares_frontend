@@ -214,5 +214,31 @@ conectarTallerWS(id_taller: number): WebSocketSubject<any> {
     }
   });
 }
+obtenerKpisTaller(id_taller: number, params?: any) {
+  let url = `${this.apiUrl}/kpis/taller/${id_taller}`;
+  const p = new URLSearchParams();
+  if (params?.fecha_inicio) p.append('fecha_inicio', params.fecha_inicio);
+  if (params?.fecha_fin) p.append('fecha_fin', params.fecha_fin);
+  if (params?.tipo_incidente) p.append('tipo_incidente', params.tipo_incidente);
+  if (p.toString()) url += `?${p.toString()}`;
+  return this.http.get(url, this.getAuthHeaders());
+}
+
+obtenerKpisAdmin(params?: any) {
+  let url = `${this.apiUrl}/kpis/admin`;
+  const p = new URLSearchParams();
+  if (params?.fecha_inicio) p.append('fecha_inicio', params.fecha_inicio);
+  if (params?.fecha_fin) p.append('fecha_fin', params.fecha_fin);
+  if (p.toString()) url += `?${p.toString()}`;
+  return this.http.get(url, this.getAuthHeaders());
+}
+obtenerKpisTenant(id_tenant: number, params?: any) {
+  let url = `${this.apiUrl}/kpis/tenant/${id_tenant}`;
+  const p = new URLSearchParams();
+  if (params?.fecha_inicio) p.append('fecha_inicio', params.fecha_inicio);
+  if (params?.fecha_fin) p.append('fecha_fin', params.fecha_fin);
+  if (p.toString()) url += `?${p.toString()}`;
+  return this.http.get(url, this.getAuthHeaders());
+}
 }
 

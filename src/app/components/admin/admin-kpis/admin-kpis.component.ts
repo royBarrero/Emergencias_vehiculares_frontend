@@ -7,14 +7,13 @@ import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
 @Component({
-  selector: 'app-tenant-reportes',
+  selector: 'app-admin-kpis',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './tenant-reportes.component.html',
-  styleUrl: './tenant-reportes.component.css'
+  templateUrl: './admin-kpis.component.html',
+  styleUrl: './admin-kpis.component.css'
 })
-export class TenantReportesComponent implements OnInit {
-  tenant: any;
+export class AdminKpisComponent implements OnInit {
   kpis: any = null;
   cargando = false;
   fechaInicio: string = '';
@@ -27,11 +26,7 @@ export class TenantReportesComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const data = localStorage.getItem('tenant');
-    if (data) {
-      this.tenant = JSON.parse(data);
-      this.cargarKpis();
-    }
+    this.cargarKpis();
   }
 
   cargarKpis() {
@@ -40,7 +35,7 @@ export class TenantReportesComponent implements OnInit {
     if (this.fechaInicio) params.fecha_inicio = new Date(this.fechaInicio).toISOString();
     if (this.fechaFin) params.fecha_fin = new Date(this.fechaFin).toISOString();
 
-    this.api.obtenerKpisTenant(this.tenant.id_tenant, params).subscribe({
+    this.api.obtenerKpisAdmin(params).subscribe({
       next: (data: any) => {
         this.ngZone.run(() => {
           this.kpis = data;
@@ -61,8 +56,8 @@ export class TenantReportesComponent implements OnInit {
   }
 
   getBarWidth(valor: number): string {
-    if (!this.kpis?.por_taller?.length) return '0%';
-    const max = Math.max(...this.kpis.por_taller.map((t: any) => t.total));
+    if (!this.kpis?.por_tenant?.length) return '0%';
+    const max = Math.max(...this.kpis.por_tenant.map((t: any) => t.total));
     return max > 0 ? `${(valor / max) * 100}%` : '0%';
   }
 
@@ -77,7 +72,7 @@ export class TenantReportesComponent implements OnInit {
 
   doc.setFontSize(18);
   doc.setTextColor(44, 62, 80);
-  doc.text(`Reporte KPIs - ${this.tenant?.nombre || 'Mi Red'}`, 14, 20);
+  doc.text('Reporte KPIs Global - EmergenciasVial', 14, 20);
   doc.setFontSize(10);
   doc.setTextColor(100);
   doc.text(`Generado: ${new Date().toLocaleDateString('es-BO')}`, 14, 28);
@@ -90,27 +85,40 @@ export class TenantReportesComponent implements OnInit {
       ['Finalizadas', this.kpis.finalizadas],
       ['Canceladas', this.kpis.canceladas],
       ['Tasa Completado', `${this.kpis.tasa_completado_pct}%`],
-      ['Ingresos Red', `Bs ${this.kpis.ingresos_total}`],
-      ['Comisión Plataforma', `Bs ${this.kpis.comision_total}`],
+      ['Ingresos Totales', `Bs ${this.kpis.ingresos_total}`],
+      ['Comisión Total', `Bs ${this.kpis.comision_total}`],
     ],
     headStyles: { fillColor: [44, 62, 80] },
     alternateRowStyles: { fillColor: [245, 245, 245] }
   });
 
-  if (this.kpis.por_taller?.length) {
+  if (this.kpis.por_tenant?.length) {
     const finalY = (doc as any).lastAutoTable.finalY + 10;
     doc.setFontSize(12);
     doc.setTextColor(44, 62, 80);
-    doc.text('Rendimiento por Taller', 14, finalY);
+    doc.text('Emergencias por Tenant', 14, finalY);
     autoTable(doc, {
       startY: finalY + 5,
-      head: [['Taller', 'Total', 'Finalizadas']],
-      body: this.kpis.por_taller.map((t: any) => [t.nombre_taller, t.total, t.finalizadas]),
+      head: [['Tenant', 'Total']],
+      body: this.kpis.por_tenant.map((t: any) => [t.tenant, t.total]),
       headStyles: { fillColor: [44, 62, 80] }
     });
   }
 
-  doc.save(`kpis-${this.tenant?.nombre}-${new Date().toISOString().split('T')[0]}.pdf`);
+  if (this.kpis.incidentes_por_tipo?.length) {
+    const finalY = (doc as any).lastAutoTable.finalY + 10;
+    doc.setFontSize(12);
+    doc.setTextColor(44, 62, 80);
+    doc.text('Incidentes por Tipo', 14, finalY);
+    autoTable(doc, {
+      startY: finalY + 5,
+      head: [['Tipo', 'Total']],
+      body: this.kpis.incidentes_por_tipo.map((i: any) => [i.tipo, i.total]),
+      headStyles: { fillColor: [44, 62, 80] }
+    });
+  }
+
+  doc.save(`kpis-global-${new Date().toISOString().split('T')[0]}.pdf`);
 }
 
 exportarExcel() {
@@ -123,14 +131,14 @@ exportarExcel() {
     ['Finalizadas', this.kpis.finalizadas],
     ['Canceladas', this.kpis.canceladas],
     ['Tasa Completado (%)', this.kpis.tasa_completado_pct],
-    ['Ingresos Red (Bs)', this.kpis.ingresos_total],
-    ['Comisión Plataforma (Bs)', this.kpis.comision_total],
+    ['Ingresos Totales (Bs)', this.kpis.ingresos_total],
+    ['Comisión Total (Bs)', this.kpis.comision_total],
   ];
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(metricas), 'KPIs');
 
-  if (this.kpis.por_taller?.length) {
-    const talleres = [['Taller', 'Total', 'Finalizadas'], ...this.kpis.por_taller.map((t: any) => [t.nombre_taller, t.total, t.finalizadas])];
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(talleres), 'Por Taller');
+  if (this.kpis.por_tenant?.length) {
+    const tenants = [['Tenant', 'Total'], ...this.kpis.por_tenant.map((t: any) => [t.tenant, t.total])];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(tenants), 'Por Tenant');
   }
 
   if (this.kpis.incidentes_por_tipo?.length) {
@@ -138,6 +146,6 @@ exportarExcel() {
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(incidentes), 'Incidentes');
   }
 
-  XLSX.writeFile(wb, `kpis-${this.tenant?.nombre}-${new Date().toISOString().split('T')[0]}.xlsx`);
+  XLSX.writeFile(wb, `kpis-global-${new Date().toISOString().split('T')[0]}.xlsx`);
 }
 }
