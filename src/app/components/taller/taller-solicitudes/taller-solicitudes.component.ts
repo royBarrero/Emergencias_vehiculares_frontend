@@ -25,6 +25,8 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
   cotizacionActual: any = null;
   mostrarFormCotizacion: boolean = false;
   enviandoCotizacion: boolean = false;
+  tiempoEstimadoInput: string = '';
+  enviandoTiempo: boolean = false;
   formCotizacion = {
     monto_estimado: null as number | null,
     descripcion_servicio: '',
@@ -219,4 +221,36 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
     };
     return colores[estado] || '#6b7280';
   }
+  actualizarTiempoEstimado() {
+  if (!this.emergenciaSeleccionada || !this.tiempoEstimadoInput) return;
+  this.enviandoTiempo = true;
+  this.api.actualizarEstadoEmergencia(this.emergenciaSeleccionada.id_emergencia, {
+    tiempo_estimado_reparacion: this.tiempoEstimadoInput
+  }).subscribe({
+    next: (data: any) => {
+      this.ngZone.run(() => {
+        this.emergenciaSeleccionada.tiempo_estimado_reparacion = this.tiempoEstimadoInput;
+        this.tiempoEstimadoInput = '';
+        this.enviandoTiempo = false;
+        this.cdr.detectChanges();
+      });
+    },
+    error: () => { this.enviandoTiempo = false; }
+  });
+}
+
+finalizarEmergencia() {
+  if (!this.emergenciaSeleccionada) return;
+  this.api.actualizarEstadoEmergencia(this.emergenciaSeleccionada.id_emergencia, {
+    estado: 'finalizada'
+  }).subscribe({
+    next: () => {
+      this.ngZone.run(() => {
+        this.emergenciaSeleccionada.estado = 'finalizada';
+        this.cargarEmergencias();
+        this.cdr.detectChanges();
+      });
+    }
+  });
+}
 }
