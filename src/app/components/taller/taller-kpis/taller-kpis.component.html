@@ -72,6 +72,7 @@
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
       </svg>
     </div>
+    
   }
 
   @if (kpis && !cargando) {
@@ -154,11 +155,69 @@
         </div>
       </div>
     </div>
+    <!-- SLA -->
+@if (sla) {
+  <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-sm font-semibold text-gray-700">Monitoreo SLA</h3>
+      <span class="text-xs text-gray-400">Umbral: {{ sla.sla_atencion_min }} min</span>
+    </div>
+
+    @if (sla.alerta) {
+      <div class="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4">
+        <svg class="w-5 h-5 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+        </svg>
+        <span class="text-sm text-red-700 font-medium">Alerta: cumplimiento SLA por debajo del 80%</span>
+      </div>
+    }
+
+    <div class="grid grid-cols-3 gap-4 mb-4">
+      <div class="text-center p-3 bg-gray-50 rounded-xl">
+        <p class="text-2xl font-bold text-gray-800">{{ sla.nivel_sla_pct }}%</p>
+        <p class="text-xs text-gray-500 mt-1">Cumplimiento</p>
+      </div>
+      <div class="text-center p-3 bg-green-50 rounded-xl">
+        <p class="text-2xl font-bold text-green-700">{{ sla.cumplidos }}</p>
+        <p class="text-xs text-gray-500 mt-1">Cumplidos</p>
+      </div>
+      <div class="text-center p-3 bg-red-50 rounded-xl">
+        <p class="text-2xl font-bold text-red-600">{{ sla.incumplidos }}</p>
+        <p class="text-xs text-gray-500 mt-1">Incumplidos</p>
+      </div>
+    </div>
+
+    <div class="w-full bg-gray-100 rounded-full h-3">
+      <div class="h-3 rounded-full transition-all"
+        [class]="sla.nivel_sla_pct >= 80 ? 'bg-green-500' : sla.nivel_sla_pct >= 60 ? 'bg-yellow-500' : 'bg-red-500'"
+        [style.width]="sla.nivel_sla_pct + '%'">
+      </div>
+    </div>
+
+    @if (sla.detalle_incumplidos?.length) {
+      <div class="mt-4">
+        <p class="text-xs font-semibold text-red-600 mb-2">Incumplimientos recientes</p>
+        <div class="space-y-2">
+          @for (item of sla.detalle_incumplidos; track item.id_emergencia) {
+            <div class="flex items-center justify-between px-3 py-2 bg-red-50 rounded-lg border border-red-100">
+              <div>
+                <span class="text-xs font-medium text-gray-800">{{ item.tipo_incidente }}</span>
+                <span class="text-xs text-gray-400 ml-2">{{ item.fecha | date:'dd/MM HH:mm' }}</span>
+              </div>
+              <span class="text-xs font-bold text-red-600">{{ item.tiempo_min }} min</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}
   }
 
   @if (!kpis && !cargando) {
     <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-12 text-center">
       <p class="text-gray-400">No hay datos disponibles para el período seleccionado</p>
     </div>
+    
   }
 </div>

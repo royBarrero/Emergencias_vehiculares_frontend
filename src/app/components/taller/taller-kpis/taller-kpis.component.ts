@@ -20,6 +20,7 @@ export class TallerKpisComponent implements OnInit {
   fechaInicio: string = '';
   fechaFin: string = '';
   tipoIncidente: string = '';
+  sla: any = null;
 
   tiposIncidente = [
     'Pinchazo', 'Falla de motor', 'Batería descargada',
@@ -51,16 +52,33 @@ export class TallerKpisComponent implements OnInit {
       next: (data: any) => {
         this.ngZone.run(() => {
           this.kpis = data;
+          this.cargarSla();
           this.cargando = false;
           this.cdr.detectChanges();
         });
       },
       error: () => { this.cargando = false; }
     });
+    
   }
+  cargarSla() {
+  const params: any = {};
+  if (this.fechaInicio) params.fecha_inicio = new Date(this.fechaInicio).toISOString();
+  if (this.fechaFin) params.fecha_fin = new Date(this.fechaFin).toISOString();
+
+  this.api.obtenerSlaTaller(this.taller.id_taller, params).subscribe({
+    next: (data: any) => {
+      this.ngZone.run(() => {
+        this.sla = data;
+        this.cdr.detectChanges();
+      });
+    }
+  });
+}
 
   aplicarFiltros() {
     this.cargarKpis();
+    this.cargarSla();
   }
 
   limpiarFiltros() {
@@ -68,6 +86,7 @@ export class TallerKpisComponent implements OnInit {
     this.fechaFin = '';
     this.tipoIncidente = '';
     this.cargarKpis();
+    this.cargarSla();
   }
 
   getBarWidth(valor: number): string {
