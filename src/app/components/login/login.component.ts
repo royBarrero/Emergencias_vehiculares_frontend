@@ -47,9 +47,30 @@ export class LoginComponent {
           case 4:
             this.router.navigate(['/admin']);
             break;
-          case 2:
-            this.router.navigate(['/taller']);
-            break;
+         case 2:
+  this.api.obtenerTallerPorUsuario(respuesta.id_usuario).subscribe({
+    next: (taller: any) => {
+      localStorage.setItem('taller', JSON.stringify(taller));
+      // Guardar OneSignal ID v16
+      try {
+        const OneSignalDeferred = (window as any).OneSignalDeferred || [];
+        OneSignalDeferred.push(async (OneSignal: any) => {
+          const userId = await OneSignal.User.PushSubscription.id;
+          console.log('OneSignal ID:', userId);
+          if (userId && taller.id_taller) {
+            this.api.actualizarOnesignalId(taller.id_taller, userId).subscribe({
+              next: () => console.log('OneSignal ID guardado'),
+              error: (e) => console.error('Error guardando OneSignal:', e)
+            });
+          }
+        });
+      } catch (e) {
+        console.error('Error OneSignal:', e);
+      }
+      this.router.navigate(['/taller']);
+    }
+  });
+  break;
           case 3:
             this.router.navigate(['/tecnico-dashboard']);
             break;

@@ -36,8 +36,8 @@ obtenerTallerPorUsuario(id_usuario: number) {
   return this.http.get(`${this.apiUrl}/talleres/por-usuario/${id_usuario}`);
 }
   // TECNICOS
-  registrarTecnico(datos: any) {
-  return this.http.post(`${this.apiUrl}/tecnicos/`, datos);
+ registrarTecnico(datos: any) {
+  return this.http.post(`${this.apiUrl}/tecnicos/`, datos, this.getAuthHeaders());
 }
  obtenerTecnicosTaller(id_taller: number) {
   return this.http.get(`${this.apiUrl}/tecnicos/taller/${id_taller}`);
@@ -284,6 +284,13 @@ obtenerSlaAdmin(params?: any) {
   if (params?.fecha_fin) p.append('fecha_fin', params.fecha_fin);
   if (p.toString()) url += `?${p.toString()}`;
   return this.http.get(url, this.getAuthHeaders());
+}
+actualizarOnesignalId(id_taller: number, onesignal_id: string) {
+  return this.http.patch(
+    `${this.apiUrl}/talleres/${id_taller}/onesignal`,
+    { onesignal_id },
+    this.getAuthHeaders()
+  );
 }
 }
 
