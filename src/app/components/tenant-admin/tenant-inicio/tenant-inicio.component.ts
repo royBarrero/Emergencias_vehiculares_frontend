@@ -22,12 +22,25 @@ export class TenantInicioComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const data = localStorage.getItem('tenant');
-    if (data) {
-      this.tenant = JSON.parse(data);
-      this.cargarTalleres();
-    }
+  const data = localStorage.getItem('tenant');
+  if (data) {
+    this.tenant = JSON.parse(data);
+    this.cargarTalleres();
+  } else {
+    // Esperar a que el layout guarde el tenant
+    const intervalo = setInterval(() => {
+      const retry = localStorage.getItem('tenant');
+      if (retry) {
+        clearInterval(intervalo);
+        this.tenant = JSON.parse(retry);
+        this.ngZone.run(() => {
+          this.cargarTalleres();
+          this.cdr.detectChanges();
+        });
+      }
+    }, 300);
   }
+}
 
   cargarTalleres() {
     this.api.obtenerTalleresPorTenant(this.tenant.id_tenant).subscribe({

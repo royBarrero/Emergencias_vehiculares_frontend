@@ -19,6 +19,7 @@ export class TenantReportesComponent implements OnInit {
   cargando = false;
   fechaInicio: string = '';
   fechaFin: string = '';
+  sla: any = null;
 
   constructor(
     private api: ApiService,
@@ -44,6 +45,7 @@ export class TenantReportesComponent implements OnInit {
       next: (data: any) => {
         this.ngZone.run(() => {
           this.kpis = data;
+          this.cargarSla();
           this.cargando = false;
           this.cdr.detectChanges();
         });
@@ -52,14 +54,31 @@ export class TenantReportesComponent implements OnInit {
     });
   }
 
-  aplicarFiltros() { this.cargarKpis(); }
+  aplicarFiltros() { 
+    this.cargarKpis(); 
+    this.cargarSla();
+  }
 
   limpiarFiltros() {
     this.fechaInicio = '';
     this.fechaFin = '';
     this.cargarKpis();
+    
   }
+cargarSla() {
+  const params: any = {};
+  if (this.fechaInicio) params.fecha_inicio = new Date(this.fechaInicio).toISOString();
+  if (this.fechaFin) params.fecha_fin = new Date(this.fechaFin).toISOString();
 
+  this.api.obtenerSlaTenant(this.tenant.id_tenant, params).subscribe({
+    next: (data: any) => {
+      this.ngZone.run(() => {
+        this.sla = data;
+        this.cdr.detectChanges();
+      });
+    }
+  });
+}
   getBarWidth(valor: number): string {
     if (!this.kpis?.por_taller?.length) return '0%';
     const max = Math.max(...this.kpis.por_taller.map((t: any) => t.total));

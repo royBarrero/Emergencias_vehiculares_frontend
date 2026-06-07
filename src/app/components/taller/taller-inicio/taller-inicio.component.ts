@@ -23,14 +23,28 @@ export class TallerInicioComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const data = localStorage.getItem('taller');
-    if (data) {
-      this.taller = JSON.parse(data);
-      this.servicios = this.taller.servicios || [];
-      this.cargarTecnicos();
-      this.cargarEstadisticas();
-    }
+  const data = localStorage.getItem('taller');
+  if (data) {
+    this.taller = JSON.parse(data);
+    this.servicios = this.taller.servicios || [];
+    this.cargarTecnicos();
+    this.cargarEstadisticas();
+  } else {
+    const intervalo = setInterval(() => {
+      const retry = localStorage.getItem('taller');
+      if (retry) {
+        clearInterval(intervalo);
+        this.taller = JSON.parse(retry);
+        this.servicios = this.taller.servicios || [];
+        this.ngZone.run(() => {
+          this.cargarTecnicos();
+          this.cargarEstadisticas();
+          this.cdr.detectChanges();
+        });
+      }
+    }, 300);
   }
+}
 
   cargarTecnicos() {
     this.api.obtenerTecnicosTaller(this.taller.id_taller).subscribe({
