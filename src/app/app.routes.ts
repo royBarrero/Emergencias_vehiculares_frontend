@@ -21,6 +21,9 @@ import { TenantInicioComponent } from './components/tenant-admin/tenant-inicio/t
 import { TenantTalleresComponent } from './components/tenant-admin/tenant-talleres/tenant-talleres.component';
 import { TenantReportesComponent } from './components/tenant-admin/tenant-reportes/tenant-reportes.component';
 import { TenantBitacoraComponent } from './components/tenant-admin/tenant-bitacora/tenant-bitacora.component';
+import { AdminBitacoraComponent } from './components/admin/admin-bitacora/admin-bitacora.component';
+import { TallerKpisComponent } from './components/taller/taller-kpis/taller-kpis.component';
+import { AdminKpisComponent } from './components/admin/admin-kpis/admin-kpis.component';
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -32,7 +35,9 @@ export const routes: Routes = [
       { path: '', redirectTo: 'inicio', pathMatch: 'full' },
       { path: 'inicio', component: AdminInicioComponent },
       { path: 'tenants', component: AdminTenantsComponent },
-      { path: 'talleres', component: AdminTalleresComponent }
+      { path: 'talleres', component: AdminTalleresComponent },
+      { path: 'bitacora', component: AdminBitacoraComponent },
+      { path: 'kpis', component: AdminKpisComponent }
     ]
   },
   {
@@ -47,6 +52,7 @@ export const routes: Routes = [
     { path: 'pagos', component: TallerPagosComponent },
     { path: 'servicios', component: TallerServiciosComponent },
     { path: 'perfil', component: TallerPerfilComponent },
+    { path: 'kpis', component: TallerKpisComponent }
   ]
 },
 {

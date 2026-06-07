@@ -1,13 +1,14 @@
 <div class="p-6 space-y-6">
+  <!-- Header -->
   <div class="flex items-center justify-between">
   <div>
-    <h1 class="text-2xl font-bold text-gray-800">KPIs / Analítica Global</h1>
-    <p class="text-sm text-gray-500 mt-1">Indicadores del sistema completo</p>
+    <h1 class="text-2xl font-bold text-gray-800">KPIs / Analítica</h1>
+    <p class="text-sm text-gray-500 mt-1">Indicadores clave de desempeño</p>
   </div>
   <div class="flex items-center gap-3">
     <div class="flex items-center gap-2">
       <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-      <span class="text-xs text-gray-500">Datos en tiempo real</span>
+      <span class="text-xs text-gray-500">Actualizado en tiempo real</span>
     </div>
     @if (kpis) {
       <button (click)="exportarPDF()"
@@ -30,7 +31,7 @@
 
   <!-- Filtros -->
   <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-4">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
       <div>
         <label class="text-xs font-medium text-gray-500 mb-1 block">Desde</label>
         <input type="date" [(ngModel)]="fechaInicio"
@@ -40,6 +41,16 @@
         <label class="text-xs font-medium text-gray-500 mb-1 block">Hasta</label>
         <input type="date" [(ngModel)]="fechaFin"
           class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"/>
+      </div>
+      <div>
+        <label class="text-xs font-medium text-gray-500 mb-1 block">Tipo de incidente</label>
+        <select [(ngModel)]="tipoIncidente"
+          class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          <option value="">Todos</option>
+          @for (tipo of tiposIncidente; track tipo) {
+            <option [value]="tipo">{{ tipo }}</option>
+          }
+        </select>
       </div>
       <div class="flex items-end gap-2">
         <button (click)="aplicarFiltros()"
@@ -64,49 +75,53 @@
   }
 
   @if (kpis && !cargando) {
+    <!-- Tarjetas métricas -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
         <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Total Emergencias</p>
         <p class="text-3xl font-bold text-gray-800 mt-2">{{ kpis.total_emergencias }}</p>
         <div class="flex gap-3 mt-3">
-          <span class="text-xs text-green-600 font-medium">✓ {{ kpis.finalizadas }}</span>
-          <span class="text-xs text-red-500 font-medium">✗ {{ kpis.canceladas }}</span>
+          <span class="text-xs text-green-600 font-medium">✓ {{ kpis.finalizadas }} finalizadas</span>
+          <span class="text-xs text-red-500 font-medium">✗ {{ kpis.canceladas }} canceladas</span>
         </div>
       </div>
 
       <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
-        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Tasa Completado</p>
-        <p class="text-3xl font-bold text-gray-800 mt-2">{{ kpis.tasa_completado_pct }}<span class="text-lg font-normal text-gray-400">%</span></p>
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Tiempo Prom. Asignación</p>
+        <p class="text-3xl font-bold text-gray-800 mt-2">{{ kpis.tiempo_promedio_asignacion_min }} <span class="text-lg font-normal text-gray-400">min</span></p>
+        <p class="text-xs text-gray-400 mt-3">Desde registro hasta asignación</p>
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Nivel SLA</p>
+        <p class="text-3xl font-bold text-gray-800 mt-2">{{ kpis.nivel_sla_pct }}<span class="text-lg font-normal text-gray-400">%</span></p>
         <div class="w-full bg-gray-100 rounded-full h-2 mt-3">
-          <div class="bg-green-500 h-2 rounded-full" [style.width]="kpis.tasa_completado_pct + '%'"></div>
+          <div class="bg-blue-600 h-2 rounded-full transition-all"
+            [style.width]="kpis.nivel_sla_pct + '%'"></div>
         </div>
       </div>
 
       <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
-        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Ingresos Red</p>
+        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Ingresos Totales</p>
         <p class="text-3xl font-bold text-gray-800 mt-2">Bs {{ kpis.ingresos_total }}</p>
         <p class="text-xs text-gray-400 mt-3">Comisión plataforma: Bs {{ kpis.comision_total }}</p>
       </div>
-
-      <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
-        <p class="text-xs font-medium text-gray-500 uppercase tracking-wider">Talleres Activos</p>
-        <p class="text-3xl font-bold text-gray-800 mt-2">{{ kpis.por_taller.length }}</p>
-        <p class="text-xs text-gray-400 mt-3">En tu red</p>
-      </div>
     </div>
 
+    <!-- Gráficos -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Incidentes por tipo -->
       <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
-        <h3 class="text-sm font-semibold text-gray-700 mb-4">Rendimiento por Taller</h3>
-        @if (kpis.por_taller.length === 0) {
-          <p class="text-sm text-gray-400 text-center py-8">Sin datos</p>
+        <h3 class="text-sm font-semibold text-gray-700 mb-4">Incidentes por Tipo</h3>
+        @if (kpis.incidentes_por_tipo.length === 0) {
+          <p class="text-sm text-gray-400 text-center py-8">Sin datos disponibles</p>
         }
         <div class="space-y-3">
-          @for (item of kpis.por_taller; track item.nombre_taller) {
+          @for (item of kpis.incidentes_por_tipo; track item.tipo) {
             <div>
               <div class="flex justify-between text-xs text-gray-600 mb-1">
-                <span>{{ item.nombre_taller }}</span>
-                <span class="font-semibold">{{ item.total }} emergencias</span>
+                <span>{{ item.tipo }}</span>
+                <span class="font-semibold">{{ item.total }}</span>
               </div>
               <div class="w-full bg-gray-100 rounded-full h-2">
                 <div class="bg-blue-500 h-2 rounded-full transition-all"
@@ -117,21 +132,22 @@
         </div>
       </div>
 
+      <!-- Técnicos eficientes -->
       <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-5">
-        <h3 class="text-sm font-semibold text-gray-700 mb-4">Incidentes por Tipo</h3>
-        @if (kpis.incidentes_por_tipo.length === 0) {
-          <p class="text-sm text-gray-400 text-center py-8">Sin datos</p>
+        <h3 class="text-sm font-semibold text-gray-700 mb-4">Técnicos más Eficientes</h3>
+        @if (kpis.tecnicos_eficientes.length === 0) {
+          <p class="text-sm text-gray-400 text-center py-8">Sin datos disponibles</p>
         }
         <div class="space-y-3">
-          @for (item of kpis.incidentes_por_tipo; track item.tipo) {
-            <div>
-              <div class="flex justify-between text-xs text-gray-600 mb-1">
-                <span>{{ item.tipo }}</span>
-                <span class="font-semibold">{{ item.total }}</span>
+          @for (tec of kpis.tecnicos_eficientes; track tec.id_tecnico; let i = $index) {
+            <div class="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                [class]="i === 0 ? 'bg-yellow-400' : i === 1 ? 'bg-gray-400' : 'bg-orange-400'">
+                {{ i + 1 }}
               </div>
-              <div class="w-full bg-gray-100 rounded-full h-2">
-                <div class="bg-purple-500 h-2 rounded-full transition-all"
-                  [style.width]="getBarWidthTipo(item.total)"></div>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-800">{{ tec.nombre }}</p>
+                <p class="text-xs text-gray-400">{{ tec.emergencias_atendidas }} emergencias atendidas</p>
               </div>
             </div>
           }
@@ -142,7 +158,7 @@
 
   @if (!kpis && !cargando) {
     <div class="bg-white rounded-xl border border-slate-100 shadow-sm p-12 text-center">
-      <p class="text-gray-400">No hay datos disponibles</p>
+      <p class="text-gray-400">No hay datos disponibles para el período seleccionado</p>
     </div>
   }
 </div>
