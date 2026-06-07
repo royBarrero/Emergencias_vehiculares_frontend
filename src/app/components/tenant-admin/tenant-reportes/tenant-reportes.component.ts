@@ -159,4 +159,37 @@ exportarExcel() {
 
   XLSX.writeFile(wb, `kpis-${this.tenant?.nombre}-${new Date().toISOString().split('T')[0]}.xlsx`);
 }
+exportarCSV() {
+  if (!this.kpis) return;
+
+  let csv = 'Indicador,Valor\n';
+  csv += `Total Emergencias,${this.kpis.total_emergencias}\n`;
+  csv += `Finalizadas,${this.kpis.finalizadas}\n`;
+  csv += `Canceladas,${this.kpis.canceladas}\n`;
+  csv += `Tasa Completado (%),${this.kpis.tasa_completado_pct}\n`;
+  csv += `Ingresos Red (Bs),${this.kpis.ingresos_total}\n`;
+  csv += `Comisión Plataforma (Bs),${this.kpis.comision_total}\n`;
+
+  if (this.kpis.por_taller?.length) {
+    csv += '\nTaller,Total,Finalizadas\n';
+    this.kpis.por_taller.forEach((t: any) => {
+      csv += `${t.nombre_taller},${t.total},${t.finalizadas}\n`;
+    });
+  }
+
+  if (this.kpis.incidentes_por_tipo?.length) {
+    csv += '\nTipo de Incidente,Total\n';
+    this.kpis.incidentes_por_tipo.forEach((i: any) => {
+      csv += `${i.tipo},${i.total}\n`;
+    });
+  }
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `kpis-${this.tenant?.nombre}-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 }

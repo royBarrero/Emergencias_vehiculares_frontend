@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit , OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
+import { OfflineService } from '../../../services/offline.service';
+import { Subscription } from 'rxjs';
+
 
 @Component({
   selector: 'app-taller-layout',
@@ -10,13 +13,16 @@ import { ApiService } from '../../../services/api.service';
   templateUrl: './taller-layout.component.html',
   styleUrl: './taller-layout.component.css'
 })
-export class TallerLayoutComponent implements OnInit {
+export class TallerLayoutComponent implements OnInit, OnDestroy {
   usuario: any;
   taller: any;
+  estaOnline: boolean = true;
+private conexionSub: Subscription | null = null;
 
   constructor(
   private router: Router,
-  private api: ApiService
+  private api: ApiService,
+ private offlineService: OfflineService
 ) {
   const data = localStorage.getItem('usuario');
   if (data) {
@@ -33,8 +39,13 @@ export class TallerLayoutComponent implements OnInit {
 }
   ngOnInit() {
     this.cargarTaller();
+    this.conexionSub = this.offlineService.hayConexion().subscribe(online => {
+  this.estaOnline = online;
+});
   }
-
+ngOnDestroy() {
+  this.conexionSub?.unsubscribe();
+}
   cargarTaller() {
   this.api.obtenerTallerPorUsuario(this.usuario.id_usuario).subscribe({
     next: (data: any) => {
