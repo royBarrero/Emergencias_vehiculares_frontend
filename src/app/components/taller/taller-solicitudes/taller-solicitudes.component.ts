@@ -23,6 +23,19 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
   private wsSubscriptions: Map<number, Subscription> = new Map();
   private wsTallerSub: Subscription | null = null;
 
+  // Cotización
+  cotizacionActual: any = null;
+  mostrarFormCotizacion: boolean = false;
+  enviandoCotizacion: boolean = false;
+  tiempoEstimadoInput: string = '';
+  enviandoTiempo: boolean = false;
+  formCotizacion = {
+    monto_estimado: null as number | null,
+    descripcion_servicio: '',
+    tiempo_estimado: '',
+    observacion: ''
+  };
+
   constructor(
     private api: ApiService,
     private cdr: ChangeDetectorRef,
@@ -155,9 +168,55 @@ conectarWSTaller() {
         this.ngZone.run(() => {
           this.emergenciaSeleccionada = data;
           this.idTecnicoSeleccionado = null;
+          this.cotizacionActual = null;
+          this.mostrarFormCotizacion = false;
+          this.cargarCotizacion(data.id_emergencia);
           this.conectarWS(data.id_emergencia);
           this.cdr.detectChanges();
         });
+      }
+    });
+  }
+
+  cargarCotizacion(id_emergencia: number) {
+    this.api.obtenerCotizacionEmergencia(id_emergencia).subscribe({
+      next: (data: any) => {
+        this.ngZone.run(() => {
+          this.cotizacionActual = data;
+          this.cdr.detectChanges();
+        });
+      },
+      error: () => {
+        this.cotizacionActual = null;
+      }
+    });
+  }
+
+  abrirFormCotizacion() {
+    this.formCotizacion = {
+      monto_estimado: null,
+      descripcion_servicio: '',
+      tiempo_estimado: '',
+      observacion: ''
+    };
+    this.mostrarFormCotizacion = true;
+  }
+
+  enviarCotizacion() {
+    if (!this.cotizacionActual || !this.formCotizacion.monto_estimado ||
+        !this.formCotizacion.descripcion_servicio || !this.formCotizacion.tiempo_estimado) return;
+    this.enviandoCotizacion = true;
+    this.api.responderCotizacion(this.cotizacionActual.id_cotizacion, this.formCotizacion).subscribe({
+      next: (data: any) => {
+        this.ngZone.run(() => {
+          this.cotizacionActual = data;
+          this.mostrarFormCotizacion = false;
+          this.enviandoCotizacion = false;
+          this.cdr.detectChanges();
+        });
+      },
+      error: () => {
+        this.enviandoCotizacion = false;
       }
     });
   }
@@ -211,6 +270,8 @@ conectarWSTaller() {
 
   cerrarDetalle() {
     this.emergenciaSeleccionada = null;
+    this.cotizacionActual = null;
+    this.mostrarFormCotizacion = false;
   }
 
   getColorPrioridad(prioridad: string): string {
@@ -229,4 +290,46 @@ conectarWSTaller() {
     };
     return colores[estado] || '#6b7280';
   }
+
+  getColorCotizacion(estado: string): string {
+    const colores: any = {
+      solicitada: '#d97706',
+      enviada: '#2563eb',
+      aceptada: '#16a34a',
+      rechazada: '#dc2626'
+    };
+    return colores[estado] || '#6b7280';
+  }
+  actualizarTiempoEstimado() {
+  if (!this.emergenciaSeleccionada || !this.tiempoEstimadoInput) return;
+  this.enviandoTiempo = true;
+  this.api.actualizarEstadoEmergencia(this.emergenciaSeleccionada.id_emergencia, {
+    tiempo_estimado_reparacion: this.tiempoEstimadoInput
+  }).subscribe({
+    next: (data: any) => {
+      this.ngZone.run(() => {
+        this.emergenciaSeleccionada.tiempo_estimado_reparacion = this.tiempoEstimadoInput;
+        this.tiempoEstimadoInput = '';
+        this.enviandoTiempo = false;
+        this.cdr.detectChanges();
+      });
+    },
+    error: () => { this.enviandoTiempo = false; }
+  });
+}
+
+finalizarEmergencia() {
+  if (!this.emergenciaSeleccionada) return;
+  this.api.actualizarEstadoEmergencia(this.emergenciaSeleccionada.id_emergencia, {
+    estado: 'finalizada'
+  }).subscribe({
+    next: () => {
+      this.ngZone.run(() => {
+        this.emergenciaSeleccionada.estado = 'finalizada';
+        this.cargarEmergencias();
+        this.cdr.detectChanges();
+      });
+    }
+  });
+}
 }
