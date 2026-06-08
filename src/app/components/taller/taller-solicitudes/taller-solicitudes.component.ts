@@ -29,6 +29,7 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
   enviandoCotizacion: boolean = false;
   tiempoEstimadoInput: string = '';
   enviandoTiempo: boolean = false;
+  cotizacionRechazada: boolean = false;
   formCotizacion = {
     monto_estimado: null as number | null,
     descripcion_servicio: '',
@@ -40,31 +41,31 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
     private api: ApiService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone
-  ) {}
+  ) { }
 
   ngOnInit() {
-  const data = localStorage.getItem('taller');
-  if (data) {
-    this.taller = JSON.parse(data);
-    this.cargarEmergencias();
-    this.cargarTecnicos();
-    this.conectarWSTaller();
-  } else {
-    const intervalo = setInterval(() => {
-      const retry = localStorage.getItem('taller');
-      if (retry) {
-        clearInterval(intervalo);
-        this.taller = JSON.parse(retry);
-        this.ngZone.run(() => {
-          this.cargarEmergencias();
-          this.cargarTecnicos();
-          this.conectarWSTaller();
-          this.cdr.detectChanges();
-        });
-      }
-    }, 300);
+    const data = localStorage.getItem('taller');
+    if (data) {
+      this.taller = JSON.parse(data);
+      this.cargarEmergencias();
+      this.cargarTecnicos();
+      this.conectarWSTaller();
+    } else {
+      const intervalo = setInterval(() => {
+        const retry = localStorage.getItem('taller');
+        if (retry) {
+          clearInterval(intervalo);
+          this.taller = JSON.parse(retry);
+          this.ngZone.run(() => {
+            this.cargarEmergencias();
+            this.cargarTecnicos();
+            this.conectarWSTaller();
+            this.cdr.detectChanges();
+          });
+        }
+      }, 300);
+    }
   }
-}
 
   ngOnDestroy() {
     this.wsSubscriptions.forEach((sub, id) => {
@@ -92,21 +93,38 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
     });
     this.wsSubscriptions.set(id_emergencia, sub);
   }
-conectarWSTaller() {
-  this.wsTallerSub = this.api.conectarTallerWS(this.taller.id_taller).subscribe({
-    next: (msg: any) => {
-      this.ngZone.run(() => {
-        if (msg.tipo === 'nueva_emergencia') {
-          this.cargarEmergencias();
-        }
-        this.cdr.detectChanges();
-      });
-    },
-    error: () => {
-      setTimeout(() => this.conectarWSTaller(), 3000);
+  conectarWSTaller() {
+    this.wsTallerSub = this.api.conectarTallerWS(this.taller.id_taller).subscribe({
+      next: (msg: any) => {
+  this.ngZone.run(() => {
+    if (msg.tipo === 'nueva_emergencia' || msg.tipo === 'cambio_estado') {
+      this.cargarEmergencias();
     }
-  });
+    if (msg.tipo === 'nueva_cotizacion') {
+  if (this.emergenciaSeleccionada?.id_emergencia === msg.id_emergencia) {
+    this.cargarCotizacion(msg.id_emergencia);
+  }
+  this.cargarEmergencias();
 }
+if (msg.tipo === 'decision_cotizacion') {
+  if (this.emergenciaSeleccionada?.id_emergencia === msg.id_emergencia) {
+    if (msg.estado === 'rechazada') {
+      this.cotizacionActual = null;
+      this.cotizacionRechazada = true;
+    } else {
+      this.cargarCotizacion(msg.id_emergencia);
+    }
+  }
+  this.cargarEmergencias();
+}
+    this.cdr.detectChanges();
+  });
+},
+      error: () => {
+        setTimeout(() => this.conectarWSTaller(), 3000);
+      }
+    });
+  }
   actualizarEmergenciaLocal(msg: any) {
     // Actualizar en lista de emergencias del taller
     const idx = this.emergenciasTaller.findIndex(e => e.id_emergencia === msg.id_emergencia);
@@ -204,7 +222,7 @@ conectarWSTaller() {
 
   enviarCotizacion() {
     if (!this.cotizacionActual || !this.formCotizacion.monto_estimado ||
-        !this.formCotizacion.descripcion_servicio || !this.formCotizacion.tiempo_estimado) return;
+      !this.formCotizacion.descripcion_servicio || !this.formCotizacion.tiempo_estimado) return;
     this.enviandoCotizacion = true;
     this.api.responderCotizacion(this.cotizacionActual.id_cotizacion, this.formCotizacion).subscribe({
       next: (data: any) => {
@@ -272,6 +290,7 @@ conectarWSTaller() {
     this.emergenciaSeleccionada = null;
     this.cotizacionActual = null;
     this.mostrarFormCotizacion = false;
+    this.cotizacionRechazada = false;
   }
 
   getColorPrioridad(prioridad: string): string {
@@ -301,35 +320,35 @@ conectarWSTaller() {
     return colores[estado] || '#6b7280';
   }
   actualizarTiempoEstimado() {
-  if (!this.emergenciaSeleccionada || !this.tiempoEstimadoInput) return;
-  this.enviandoTiempo = true;
-  this.api.actualizarEstadoEmergencia(this.emergenciaSeleccionada.id_emergencia, {
-    tiempo_estimado_reparacion: this.tiempoEstimadoInput
-  }).subscribe({
-    next: (data: any) => {
-      this.ngZone.run(() => {
-        this.emergenciaSeleccionada.tiempo_estimado_reparacion = this.tiempoEstimadoInput;
-        this.tiempoEstimadoInput = '';
-        this.enviandoTiempo = false;
-        this.cdr.detectChanges();
-      });
-    },
-    error: () => { this.enviandoTiempo = false; }
-  });
-}
+    if (!this.emergenciaSeleccionada || !this.tiempoEstimadoInput) return;
+    this.enviandoTiempo = true;
+    this.api.actualizarEstadoEmergencia(this.emergenciaSeleccionada.id_emergencia, {
+      tiempo_estimado_reparacion: this.tiempoEstimadoInput
+    }).subscribe({
+      next: (data: any) => {
+        this.ngZone.run(() => {
+          this.emergenciaSeleccionada.tiempo_estimado_reparacion = this.tiempoEstimadoInput;
+          this.tiempoEstimadoInput = '';
+          this.enviandoTiempo = false;
+          this.cdr.detectChanges();
+        });
+      },
+      error: () => { this.enviandoTiempo = false; }
+    });
+  }
 
-finalizarEmergencia() {
-  if (!this.emergenciaSeleccionada) return;
-  this.api.actualizarEstadoEmergencia(this.emergenciaSeleccionada.id_emergencia, {
-    estado: 'finalizada'
-  }).subscribe({
-    next: () => {
-      this.ngZone.run(() => {
-        this.emergenciaSeleccionada.estado = 'finalizada';
-        this.cargarEmergencias();
-        this.cdr.detectChanges();
-      });
-    }
-  });
-}
+  finalizarEmergencia() {
+    if (!this.emergenciaSeleccionada) return;
+    this.api.actualizarEstadoEmergencia(this.emergenciaSeleccionada.id_emergencia, {
+      estado: 'finalizada'
+    }).subscribe({
+      next: () => {
+        this.ngZone.run(() => {
+          this.emergenciaSeleccionada.estado = 'finalizada';
+          this.cargarEmergencias();
+          this.cdr.detectChanges();
+        });
+      }
+    });
+  }
 }
