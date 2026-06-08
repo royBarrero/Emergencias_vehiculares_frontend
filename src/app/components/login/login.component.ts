@@ -47,35 +47,34 @@ export class LoginComponent {
           case 4:
             this.router.navigate(['/admin']);
             break;
-         case 2:
+        case 2:
   this.api.obtenerTallerPorUsuario(respuesta.id_usuario).subscribe({
     next: (taller: any) => {
       localStorage.setItem('taller', JSON.stringify(taller));
       this.router.navigate(['/taller']);
 
-      // Esperar un momento para que OneSignal esté listo
-      setTimeout(() => {
+      const guardarOnesignalId = (intentos = 0) => {
+        if (intentos > 10) return;
         try {
           const OneSignalDeferred = (window as any).OneSignalDeferred || [];
           OneSignalDeferred.push(async (OneSignal: any) => {
-            // Esperar a que la suscripción esté activa
-            const subscription = OneSignal.User.pushSubscription;
-            const userId = subscription?.id;
+            const userId = OneSignal.User.pushSubscription.id;
             console.log('OneSignal subscription ID:', userId);
-
             if (userId && taller.id_taller) {
               this.api.actualizarOnesignalId(taller.id_taller, userId).subscribe({
                 next: () => console.log('✅ OneSignal ID guardado:', userId),
-                error: (e) => console.error('❌ Error guardando OneSignal:', e)
+                error: (e) => console.error('❌ Error:', e)
               });
             } else {
-              console.warn('⚠️ OneSignal ID no disponible aún, id:', userId);
+              console.warn('⚠️ Reintentando... intento:', intentos + 1);
+              setTimeout(() => guardarOnesignalId(intentos + 1), 2000);
             }
           });
         } catch (e) {
           console.error('Error OneSignal:', e);
         }
-      }, 3000); // 3 segundos para que OneSignal inicialice
+      };
+      setTimeout(() => guardarOnesignalId(), 2000);
     }
   });
   break;
