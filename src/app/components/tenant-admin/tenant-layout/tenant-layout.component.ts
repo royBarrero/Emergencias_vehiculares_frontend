@@ -41,9 +41,19 @@ export class TenantLayoutComponent implements OnInit {
   }
 
   cerrarSesion() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuario');
-    localStorage.removeItem('tenant');
-    this.router.navigate(['/login']);
-  }
+  this.api.logout().subscribe({
+    next: () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
+      localStorage.removeItem('tenant');
+      this.router.navigate(['/login']);
+    },
+    error: () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
+      localStorage.removeItem('tenant');
+      this.router.navigate(['/login']);
+    }
+  });
+}
 }

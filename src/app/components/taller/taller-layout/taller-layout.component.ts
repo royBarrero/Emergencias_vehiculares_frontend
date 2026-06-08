@@ -56,10 +56,20 @@ ngOnDestroy() {
 }
 
   cerrarSesion() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuario');
-    localStorage.removeItem('taller');
-    this.router.navigate(['/login']);
-  }
-  
+  this.api.logout().subscribe({
+    next: () => {
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
+      localStorage.removeItem('taller');
+      this.router.navigate(['/login']);
+    },
+    error: () => {
+      // Si falla igual cerramos sesión localmente
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
+      localStorage.removeItem('taller');
+      this.router.navigate(['/login']);
+    }
+  });
+}
 }
