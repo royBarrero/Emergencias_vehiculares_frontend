@@ -53,28 +53,31 @@ export class LoginComponent {
       localStorage.setItem('taller', JSON.stringify(taller));
       this.router.navigate(['/taller']);
 
-      const guardarOnesignalId = (intentos = 0) => {
-        if (intentos > 10) return;
-        try {
-          const OneSignalDeferred = (window as any).OneSignalDeferred || [];
-          OneSignalDeferred.push(async (OneSignal: any) => {
-            const userId = OneSignal.User?.pushSubscription?.id;
-            console.log('OneSignal subscription ID:', userId);
+      try {
+        const OneSignalDeferred = (window as any).OneSignalDeferred || [];
+        OneSignalDeferred.push(async (OneSignal: any) => {
+          // Usar el listener de cambio de suscripción
+          OneSignal.User.pushSubscription.addEventListener('change', (event: any) => {
+            const userId = event.current?.id;
+            console.log('OneSignal ID via listener:', userId);
             if (userId && taller.id_taller) {
               this.api.actualizarOnesignalId(taller.id_taller, userId).subscribe({
                 next: () => console.log('✅ OneSignal ID guardado:', userId),
-                error: (e) => console.error('❌ Error:', e)
               });
-            } else {
-              console.warn('⚠️ Reintentando... intento:', intentos + 1);
-              setTimeout(() => guardarOnesignalId(intentos + 1), 2000);
             }
           });
-        } catch (e) {
-          console.error('Error OneSignal:', e);
-        }
-      };
-      setTimeout(() => guardarOnesignalId(), 2000);
+
+          // También intentar obtenerlo directamente si ya existe
+          const userId = OneSignal.User.pushSubscription.id;
+          if (userId && taller.id_taller) {
+            this.api.actualizarOnesignalId(taller.id_taller, userId).subscribe({
+              next: () => console.log('✅ OneSignal ID guardado directo:', userId),
+            });
+          }
+        });
+      } catch (e) {
+        console.error('Error OneSignal:', e);
+      }
     }
   });
   break;
