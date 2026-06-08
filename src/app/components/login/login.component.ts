@@ -58,7 +58,7 @@ export class LoginComponent {
         try {
           const OneSignalDeferred = (window as any).OneSignalDeferred || [];
           OneSignalDeferred.push(async (OneSignal: any) => {
-            const userId = OneSignal.User.pushSubscription.id;
+            const userId = OneSignal.User?.pushSubscription?.id;
             console.log('OneSignal subscription ID:', userId);
             if (userId && taller.id_taller) {
               this.api.actualizarOnesignalId(taller.id_taller, userId).subscribe({
