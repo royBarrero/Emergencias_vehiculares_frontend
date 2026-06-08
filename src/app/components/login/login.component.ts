@@ -61,6 +61,8 @@ export class LoginComponent {
             await OneSignal.Notifications.requestPermission();
             
             // Esperar un momento y leer el ID
+            console.log('OneSignal.User:', OneSignal.User);
+console.log('OneSignal.Notifications.permission:', OneSignal.Notifications.permission);
             setTimeout(() => {
               const userId = OneSignal.User?.pushSubscription?.id;
               console.log('OneSignal ID:', userId);
