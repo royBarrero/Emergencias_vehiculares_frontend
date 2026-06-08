@@ -56,23 +56,22 @@ export class LoginComponent {
       try {
         const OneSignalDeferred = (window as any).OneSignalDeferred || [];
         OneSignalDeferred.push(async (OneSignal: any) => {
-          // Usar el listener de cambio de suscripción
-          OneSignal.User.pushSubscription.addEventListener('change', (event: any) => {
-            const userId = event.current?.id;
-            console.log('OneSignal ID via listener:', userId);
-            if (userId && taller.id_taller) {
-              this.api.actualizarOnesignalId(taller.id_taller, userId).subscribe({
-                next: () => console.log('✅ OneSignal ID guardado:', userId),
-              });
-            }
-          });
-
-          // También intentar obtenerlo directamente si ya existe
-          const userId = OneSignal.User.pushSubscription.id;
-          if (userId && taller.id_taller) {
-            this.api.actualizarOnesignalId(taller.id_taller, userId).subscribe({
-              next: () => console.log('✅ OneSignal ID guardado directo:', userId),
-            });
+          try {
+            // Solicitar permiso explícitamente
+            await OneSignal.Notifications.requestPermission();
+            
+            // Esperar un momento y leer el ID
+            setTimeout(() => {
+              const userId = OneSignal.User?.pushSubscription?.id;
+              console.log('OneSignal ID:', userId);
+              if (userId && taller.id_taller) {
+                this.api.actualizarOnesignalId(taller.id_taller, userId).subscribe({
+                  next: () => console.log('✅ OneSignal ID guardado:', userId),
+                });
+              }
+            }, 5000);
+          } catch(e) {
+            console.error('Error solicitando permiso OneSignal:', e);
           }
         });
       } catch (e) {
