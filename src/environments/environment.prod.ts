@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://emergencias-vehiculares-api.onrender.com'
+  apiUrl: 'https://backend-597509309669.us-central1.run.app',
+  wsUrl: 'wss://backend-597509309669.us-central1.run.app'
 };
