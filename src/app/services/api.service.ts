@@ -309,7 +309,7 @@ crearCotizacion(id_emergencia: number, id_taller: number, datos: any) {
   // WEBSOCKETS
   conectarEmergenciaWS(id_emergencia: number): Observable<any> {
     return new Observable(observer => {
-      const wsUrl = `ws://localhost:8000/ws/emergencia/${id_emergencia}`;
+      const wsUrl = `wss://backend-597509309669.us-central1.run.app/ws/emergencia/${id_emergencia}`;
       const ws = new WebSocket(wsUrl);
       this.wsConnections.set(id_emergencia, ws);
       ws.onmessage = (event) => {
@@ -337,7 +337,7 @@ crearCotizacion(id_emergencia: number, id_taller: number, datos: any) {
 
   conectarTallerWS(id_taller: number): Observable<any> {
     return new Observable(observer => {
-      const wsUrl = `ws://localhost:8000/ws/taller/${id_taller}`;
+      const wsUrl = `wss://backend-597509309669.us-central1.run.app/ws/taller/${id_taller}`;
       const ws = new WebSocket(wsUrl);
       this.wsTallerSocket = ws;
       ws.onmessage = (event) => {
