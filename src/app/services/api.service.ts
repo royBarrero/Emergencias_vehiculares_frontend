@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
 
-  private apiUrl = environment.apiUrl;
+  private apiUrl = 'https://backend-597509309669.us-central1.run.app';
   private wsConnections: Map<number, WebSocket> = new Map();
   private wsTallerSocket: WebSocket | null = null;
 
