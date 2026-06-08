@@ -55,27 +55,27 @@ export class LoginComponent {
 
       try {
         const OneSignalDeferred = (window as any).OneSignalDeferred || [];
-        OneSignalDeferred.push(async (OneSignal: any) => {
-          try {
-            // Solicitar permiso explícitamente
-            await OneSignal.Notifications.requestPermission();
-            
-            // Esperar un momento y leer el ID
-            console.log('OneSignal.User:', OneSignal.User);
-console.log('OneSignal.Notifications.permission:', OneSignal.Notifications.permission);
-            setTimeout(() => {
-              const userId = OneSignal.User?.pushSubscription?.id;
-              console.log('OneSignal ID:', userId);
-              if (userId && taller.id_taller) {
-                this.api.actualizarOnesignalId(taller.id_taller, userId).subscribe({
-                  next: () => console.log('✅ OneSignal ID guardado:', userId),
-                });
-              }
-            }, 5000);
-          } catch(e) {
-            console.error('Error solicitando permiso OneSignal:', e);
-          }
+       OneSignalDeferred.push(async (OneSignal: any) => {
+  try {
+    // Escuchar cuando el ID esté disponible
+    OneSignal.User.pushSubscription.optIn();
+    
+    setTimeout(() => {
+      const token = OneSignal.User?.pushSubscription?.token;
+      const id = OneSignal.User?.pushSubscription?.id;
+      console.log('token:', token, 'id:', id);
+      
+      const userId = id || token;
+      if (userId && taller.id_taller) {
+        this.api.actualizarOnesignalId(taller.id_taller, userId).subscribe({
+          next: () => console.log('✅ OneSignal ID guardado:', userId),
         });
+      }
+    }, 5000);
+  } catch(e) {
+    console.error('Error OneSignal:', e);
+  }
+});
       } catch (e) {
         console.error('Error OneSignal:', e);
       }
