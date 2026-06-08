@@ -8,8 +8,8 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
 
-  //private apiUrl = 'https://backend-597509309669.us-central1.run.app';
-  private apiUrl = 'http://localhost:8000';
+  private apiUrl = 'https://backend-597509309669.us-central1.run.app';
+  //private apiUrl = 'http://localhost:8000';
   private wsConnections: Map<number, WebSocket> = new Map();
   private wsTallerSocket: WebSocket | null = null;
 
@@ -222,7 +222,14 @@ export class ApiService {
   responderCotizacion(id_cotizacion: number, datos: any) {
     return this.http.put(`${this.apiUrl}/cotizaciones/${id_cotizacion}/responder`, datos, this.getAuthHeaders());
   }
-
+crearCotizacion(id_emergencia: number, id_taller: number, datos: any) {
+  // Primero solicita (crea) la cotización, luego la responde en un solo flujo
+  return this.http.post(
+    `${this.apiUrl}/cotizaciones/solicitar`,
+    { id_emergencia, id_taller },
+    this.getAuthHeaders()
+  );
+}
   // KPIs
   obtenerKpisTaller(id_taller: number, params?: any) {
     let url = `${this.apiUrl}/kpis/taller/${id_taller}`;

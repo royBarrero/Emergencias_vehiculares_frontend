@@ -24,8 +24,6 @@
   </div>
 
   <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-
-    <!-- Lista -->
     <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
       <div class="px-6 py-4 border-b border-gray-100">
         <h3 class="text-sm font-semibold text-gray-700">
@@ -75,298 +73,302 @@
         </ng-container>
 
       </div>
-    </div>
 
-   <!-- Modal detalle -->
-<div *ngIf="emergenciaSeleccionada"
-  class="fixed inset-0 z-50 flex items-center justify-center p-4"
-  style="background: rgba(0,0,0,0.5)">
+      <!-- Modal detalle -->
+      <div *ngIf="mostrarModal && emergenciaSeleccionada"
+        class="absolute inset-0 z-50 flex items-center justify-center p-4"
+        style="background: rgba(0,0,0,0.5)">
 
-  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
 
-    <!-- Header del modal con color según estado -->
-    <div class="rounded-t-2xl px-6 py-5 flex items-center justify-between"
-      [style.background]="getColorEstado(emergenciaSeleccionada.estado)">
-      <div>
-        <h3 class="text-lg font-bold text-white">{{ emergenciaSeleccionada.tipo_incidente }}</h3>
-        <div class="flex items-center gap-2 mt-1">
-          <span class="text-xs text-white/80">Emergencia #{{ emergenciaSeleccionada.id_emergencia }}</span>
-          <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-white/20 text-white">
-            {{ emergenciaSeleccionada.estado }}
-          </span>
-        </div>
-      </div>
-      <button (click)="cerrarDetalle()"
-        class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-all">
-        ✕
-      </button>
-    </div>
-
-    <div class="p-6 flex flex-col gap-4">
-
-      <!-- Info básica -->
-      <div class="grid grid-cols-2 gap-3">
-        <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
-          <p class="text-xs text-gray-500 mb-1">Prioridad</p>
-          <p class="text-sm font-bold" [style.color]="getColorPrioridad(emergenciaSeleccionada.prioridad)">
-            ● {{ emergenciaSeleccionada.prioridad | uppercase }}
-          </p>
-        </div>
-        <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
-          <p class="text-xs text-gray-500 mb-1">Dirección</p>
-          <p class="text-sm font-semibold text-gray-800">{{ emergenciaSeleccionada.direccion_aproximada || '-' }}</p>
-        </div>
-      </div>
-
-      <div *ngIf="emergenciaSeleccionada.descripcion" class="bg-slate-50 rounded-xl p-3 border border-slate-100">
-        <p class="text-xs text-gray-500 mb-1">Descripción</p>
-        <p class="text-sm text-gray-700">{{ emergenciaSeleccionada.descripcion }}</p>
-      </div>
-
-      <!-- Evidencias: fotos y audio -->
-      <div *ngIf="emergenciaSeleccionada.evidencias?.length > 0" class="flex flex-col gap-3">
-        <p class="text-sm font-semibold text-gray-700">📎 Evidencias del conductor</p>
-
-        <!-- Fotos -->
-        <div class="flex gap-2 flex-wrap">
-          <ng-container *ngFor="let ev of emergenciaSeleccionada.evidencias">
-            <a *ngIf="ev.tipo === 'foto'" [href]="ev.url_archivo" target="_blank"
-              class="relative group">
-              <img [src]="ev.url_archivo" alt="Foto evidencia"
-                class="w-24 h-24 object-cover rounded-xl border-2 border-slate-200 hover:border-blue-400 transition-all cursor-pointer shadow-sm"/>
-              <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-xl transition-all flex items-center justify-center">
-                <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                </svg>
+          <!-- Header -->
+          <div class="rounded-t-2xl px-6 py-5 flex items-center justify-between"
+            [style.background]="getColorEstado(emergenciaSeleccionada.estado)">
+            <div>
+              <h3 class="text-lg font-bold text-white">{{ emergenciaSeleccionada.tipo_incidente }}</h3>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="text-xs text-white/80">Emergencia #{{ emergenciaSeleccionada.id_emergencia }}</span>
+                <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-white/20 text-white">
+                  {{ emergenciaSeleccionada.estado }}
+                </span>
               </div>
-            </a>
-          </ng-container>
-        </div>
-
-        <!-- Audio -->
-        <ng-container *ngFor="let ev of emergenciaSeleccionada.evidencias">
-  <div *ngIf="ev.tipo === 'audio'" class="bg-slate-50 border border-slate-200 rounded-xl p-4">
-    <p class="text-sm font-bold text-slate-700 mb-3">Nota de voz del conductor</p>
-    <audio controls class="w-full mb-3" [src]="ev.url_archivo"></audio>
-    
-    @if (ev.transcripcion) {
-      <div class="flex flex-col gap-2">
-        @for (linea of ev.transcripcion.split('\n'); track linea) {
-          @if (linea.trim()) {
-            @if (linea.startsWith('TRANSCRIPCIÓN:')) {
-              <div class="bg-white rounded-lg p-3 border border-slate-200">
-                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Transcripción</p>
-                <p class="text-sm text-gray-800">{{ linea.replace('TRANSCRIPCIÓN:', '').trim() }}</p>
-              </div>
-            } @else if (linea.startsWith('DIAGNÓSTICO PRELIMINAR:')) {
-              <div class="bg-blue-50 rounded-lg p-3 border border-blue-100">
-                <p class="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Diagnóstico preliminar</p>
-                <p class="text-sm text-gray-800">{{ linea.replace('DIAGNÓSTICO PRELIMINAR:', '').trim() }}</p>
-              </div>
-            }
-          }
-        }
-      </div>
-    }
-  </div>
-</ng-container>
-
-        <ng-container *ngFor="let ev of emergenciaSeleccionada.evidencias">
-  <div *ngIf="ev.clasificacion_ia" class="bg-purple-50 border border-purple-200 rounded-xl p-4">
-    <p class="text-sm font-bold text-purple-800 mb-3">Análisis de IA</p>
-    <div class="flex flex-col gap-3">
-      @for (linea of ev.clasificacion_ia.split('\n'); track linea) {
-        @if (linea.trim()) {
-          @if (linea.startsWith('PROBLEMA:')) {
-            <div class="bg-white rounded-lg p-3 border border-purple-100">
-              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Problema identificado</p>
-              <p class="text-sm text-gray-800">{{ linea.replace('PROBLEMA:', '').trim() }}</p>
             </div>
-          } @else if (linea.startsWith('CAUSA:')) {
-            <div class="bg-white rounded-lg p-3 border border-purple-100">
-              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Posible causa</p>
-              <p class="text-sm text-gray-800">{{ linea.replace('CAUSA:', '').trim() }}</p>
-            </div>
-          } @else if (linea.startsWith('URGENCIA:')) {
-            <div class="bg-white rounded-lg p-3 border border-purple-100">
-              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Nivel de urgencia</p>
-              <p class="text-sm font-bold"
-                [class]="linea.includes('ALTA') ? 'text-red-600' : linea.includes('MEDIA') ? 'text-orange-500' : 'text-green-600'">
-                {{ linea.replace('URGENCIA:', '').trim() }}
-              </p>
-            </div>
-          } @else if (linea.startsWith('RECOMENDACION:')) {
-            <div class="bg-white rounded-lg p-3 border border-purple-100">
-              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Recomendación</p>
-              <p class="text-sm text-gray-800">{{ linea.replace('RECOMENDACION:', '').trim() }}</p>
-            </div>
-          }
-        }
-      }
-    </div>
-  </div>
-</ng-container>
-
-      <!-- Acciones: aceptar/rechazar -->
-      <div *ngIf="emergenciaSeleccionada.estado === 'pendiente'" class="flex gap-3 pt-2">
-        <button (click)="aceptarEmergencia()"
-          class="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2.5 rounded-xl transition-all">
-          ✓ Aceptar
-        </button>
-        <button (click)="rechazarEmergencia()"
-          class="flex-1 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-medium py-2.5 rounded-xl transition-all">
-          ✕ Rechazar
-        </button>
-      </div>
-
-      <!-- Sección cotización cuando estado es asignada -->
-      <div *ngIf="emergenciaSeleccionada.estado === 'asignada'" class="flex flex-col gap-3 pt-2">
-
-        <div *ngIf="!cotizacionActual && !emergenciaSeleccionada.atencion_directa"
-          class="bg-gray-50 rounded-xl p-4 text-center text-sm text-gray-400">
-          Esperando decisión del conductor...
-        </div>
-
-        <div *ngIf="!cotizacionActual && emergenciaSeleccionada.atencion_directa" class="flex flex-col gap-3">
-          <div class="bg-green-50 border border-green-200 rounded-xl p-3">
-            <p class="text-sm font-semibold text-green-700">✅ Conductor eligió atención directa</p>
-            <p class="text-xs text-green-600 mt-1">Asigna un técnico para iniciar el servicio.</p>
-          </div>
-        </div>
-
-        <div *ngIf="cotizacionActual && cotizacionActual.estado === 'solicitada'" class="flex flex-col gap-3">
-          <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
-            <p class="text-amber-600 text-sm font-semibold">⏳ Cotización solicitada</p>
-            <p class="text-xs text-amber-700 mt-1">El conductor está esperando tu respuesta.</p>
-          </div>
-          <div *ngIf="!mostrarFormCotizacion">
-            <button (click)="abrirFormCotizacion()"
-              class="w-full bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium py-2.5 rounded-xl transition-all">
-              Responder cotización
+            <button (click)="cerrarDetalle()"
+              class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-all">
+              ✕
             </button>
           </div>
-          <div *ngIf="mostrarFormCotizacion" class="flex flex-col gap-3 bg-gray-50 rounded-xl p-4">
-            <p class="text-sm font-semibold text-gray-700">Completar cotización</p>
-            <div>
-              <label class="text-xs text-gray-500 mb-1 block">Monto estimado (Bs) *</label>
-              <input type="number" [(ngModel)]="formCotizacion.monto_estimado" placeholder="Ej: 180"
-                class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"/>
+
+          <div class="p-6 relative">
+
+            <!-- Info básica -->
+            <div class="grid grid-cols-2 gap-3 mb-3">
+              <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                <p class="text-xs text-gray-500 mb-1">Prioridad</p>
+                <p class="text-sm font-bold" [style.color]="getColorPrioridad(emergenciaSeleccionada.prioridad)">
+                  ● {{ emergenciaSeleccionada.prioridad | uppercase }}
+                </p>
+              </div>
+              <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                <p class="text-xs text-gray-500 mb-1">Dirección</p>
+                <p class="text-sm font-semibold text-gray-800">{{ emergenciaSeleccionada.direccion_aproximada || '-' }}</p>
+              </div>
             </div>
-            <div>
-              <label class="text-xs text-gray-500 mb-1 block">Descripción del servicio *</label>
-              <input type="text" [(ngModel)]="formCotizacion.descripcion_servicio"
-                placeholder="Ej: Cambio de neumático + revisión básica"
-                class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"/>
+
+            <div *ngIf="emergenciaSeleccionada.descripcion" class="bg-slate-50 rounded-xl p-3 border border-slate-100 mb-3">
+              <p class="text-xs text-gray-500 mb-1">Descripción</p>
+              <p class="text-sm text-gray-700">{{ emergenciaSeleccionada.descripcion }}</p>
             </div>
-            <div>
-              <label class="text-xs text-gray-500 mb-1 block">Tiempo estimado *</label>
-              <input type="text" [(ngModel)]="formCotizacion.tiempo_estimado" placeholder="Ej: 35 min"
-                class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"/>
+
+            <!-- Evidencias -->
+            <div *ngIf="emergenciaSeleccionada.evidencias?.length > 0" class="flex flex-col gap-3 mb-3">
+              <p class="text-sm font-semibold text-gray-700">📎 Evidencias del conductor</p>
+
+              <!-- Fotos -->
+              <div class="flex gap-2 flex-wrap">
+                <ng-container *ngFor="let ev of emergenciaSeleccionada.evidencias">
+                  <a *ngIf="ev.tipo === 'foto'" [href]="ev.url_archivo" target="_blank" class="relative group">
+                    <img [src]="ev.url_archivo" alt="Foto evidencia"
+                      class="w-24 h-24 object-cover rounded-xl border-2 border-slate-200 hover:border-blue-400 transition-all cursor-pointer shadow-sm"/>
+                    <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-xl transition-all flex items-center justify-center">
+                      <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                      </svg>
+                    </div>
+                  </a>
+                </ng-container>
+              </div>
+
+              <!-- Audio -->
+              <ng-container *ngFor="let ev of emergenciaSeleccionada.evidencias">
+                <div *ngIf="ev.tipo === 'audio'" class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                  <p class="text-sm font-bold text-slate-700 mb-3">Nota de voz del conductor</p>
+                  <audio controls class="w-full mb-3" [src]="ev.url_archivo"></audio>
+                  @if (ev.transcripcion) {
+                    <div class="flex flex-col gap-2">
+                      @for (linea of ev.transcripcion.split('\n'); track linea) {
+                        @if (linea.trim()) {
+                          @if (linea.startsWith('TRANSCRIPCIÓN:')) {
+                            <div class="bg-white rounded-lg p-3 border border-slate-200">
+                              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Transcripción</p>
+                              <p class="text-sm text-gray-800">{{ linea.replace('TRANSCRIPCIÓN:', '').trim() }}</p>
+                            </div>
+                          } @else if (linea.startsWith('DIAGNÓSTICO PRELIMINAR:')) {
+                            <div class="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                              <p class="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">Diagnóstico preliminar</p>
+                              <p class="text-sm text-gray-800">{{ linea.replace('DIAGNÓSTICO PRELIMINAR:', '').trim() }}</p>
+                            </div>
+                          }
+                        }
+                      }
+                    </div>
+                  }
+                </div>
+              </ng-container>
+
+              <!-- Análisis IA -->
+              <ng-container *ngFor="let ev of emergenciaSeleccionada.evidencias">
+                <div *ngIf="ev.clasificacion_ia" class="bg-purple-50 border border-purple-200 rounded-xl p-4">
+                  <p class="text-sm font-bold text-purple-800 mb-3">Análisis de IA</p>
+                  <div class="flex flex-col gap-3">
+                    @for (linea of ev.clasificacion_ia.split('\n'); track linea) {
+                      @if (linea.trim()) {
+                        @if (linea.startsWith('PROBLEMA:')) {
+                          <div class="bg-white rounded-lg p-3 border border-purple-100">
+                            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Problema identificado</p>
+                            <p class="text-sm text-gray-800">{{ linea.replace('PROBLEMA:', '').trim() }}</p>
+                          </div>
+                        } @else if (linea.startsWith('CAUSA:')) {
+                          <div class="bg-white rounded-lg p-3 border border-purple-100">
+                            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Posible causa</p>
+                            <p class="text-sm text-gray-800">{{ linea.replace('CAUSA:', '').trim() }}</p>
+                          </div>
+                        } @else if (linea.startsWith('URGENCIA:')) {
+                          <div class="bg-white rounded-lg p-3 border border-purple-100">
+                            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Nivel de urgencia</p>
+                            <p class="text-sm font-bold"
+                              [class]="linea.includes('ALTA') ? 'text-red-600' : linea.includes('MEDIA') ? 'text-orange-500' : 'text-green-600'">
+                              {{ linea.replace('URGENCIA:', '').trim() }}
+                            </p>
+                          </div>
+                        } @else if (linea.startsWith('RECOMENDACION:')) {
+                          <div class="bg-white rounded-lg p-3 border border-purple-100">
+                            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Recomendación</p>
+                            <p class="text-sm text-gray-800">{{ linea.replace('RECOMENDACION:', '').trim() }}</p>
+                          </div>
+                        }
+                      }
+                    }
+                  </div>
+                </div>
+              </ng-container>
             </div>
-            <div>
-              <label class="text-xs text-gray-500 mb-1 block">Observación (opcional)</label>
-              <textarea [(ngModel)]="formCotizacion.observacion" rows="2"
-                placeholder="Ej: El costo puede variar si se detecta daño adicional"
-                class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"></textarea>
+            <!-- FIN Evidencias -->
+
+            <!-- ==================== ACCIONES POR ESTADO ==================== -->
+
+            <!-- ESTADO: PENDIENTE -->
+            <div *ngIf="emergenciaSeleccionada.estado === 'pendiente'" class="flex flex-col gap-3 pt-2">
+
+              <!-- Sin cotización aún -->
+              <div *ngIf="!cotizacionActual && !mostrarFormCotizacion">
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-3">
+                  <p class="text-sm font-semibold text-amber-700">⏳ Nueva solicitud — envía tu cotización</p>
+                  <p class="text-xs text-amber-600 mt-1">El conductor está esperando tu respuesta.</p>
+                </div>
+                <button (click)="abrirFormCotizacion()"
+                  class="w-full bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium py-2.5 rounded-xl transition-all">
+                  Enviar cotización
+                </button>
+              </div>
+
+              <!-- Conductor ya solicitó cotización -->
+              <div *ngIf="cotizacionActual && cotizacionActual.estado === 'solicitada' && !mostrarFormCotizacion">
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-3">
+                  <p class="text-sm font-semibold text-amber-700">⏳ El conductor solicitó cotización</p>
+                  <p class="text-xs text-amber-600 mt-1">Revisa los detalles y envía tu precio.</p>
+                </div>
+                <button (click)="abrirFormCotizacion()"
+                  class="w-full bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium py-2.5 rounded-xl transition-all">
+                  Responder cotización
+                </button>
+              </div>
+
+              <!-- Formulario cotización -->
+              <div *ngIf="mostrarFormCotizacion" class="flex flex-col gap-3 bg-gray-50 rounded-xl p-4">
+                <p class="text-sm font-semibold text-gray-700">Completar cotización</p>
+                <div>
+                  <label class="text-xs text-gray-500 mb-1 block">Monto estimado (Bs) *</label>
+                  <input type="number" [(ngModel)]="formCotizacion.monto_estimado" placeholder="Ej: 180"
+                    class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"/>
+                </div>
+                <div>
+                  <label class="text-xs text-gray-500 mb-1 block">Descripción del servicio *</label>
+                  <input type="text" [(ngModel)]="formCotizacion.descripcion_servicio"
+                    placeholder="Ej: Cambio de neumático + revisión básica"
+                    class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"/>
+                </div>
+                <div>
+                  <label class="text-xs text-gray-500 mb-1 block">Tiempo estimado *</label>
+                  <input type="text" [(ngModel)]="formCotizacion.tiempo_estimado" placeholder="Ej: 35 min"
+                    class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"/>
+                </div>
+                <div>
+                  <label class="text-xs text-gray-500 mb-1 block">Observación (opcional)</label>
+                  <textarea [(ngModel)]="formCotizacion.observacion" rows="2"
+                    placeholder="Ej: El costo puede variar si se detecta daño adicional"
+                    class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"></textarea>
+                </div>
+                <div class="flex gap-2">
+                  <button (click)="crearYEnviarCotizacion()" [disabled]="enviandoCotizacion"
+                    class="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-sm font-medium py-2.5 rounded-xl transition-all">
+                    {{ enviandoCotizacion ? 'Enviando...' : 'Enviar cotización' }}
+                  </button>
+                  <button (click)="mostrarFormCotizacion = false"
+                    class="px-4 bg-gray-200 hover:bg-gray-300 text-gray-600 text-sm font-medium py-2.5 rounded-xl transition-all">
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+
+              <!-- Cotización enviada, esperando decisión -->
+              <div *ngIf="cotizacionActual && cotizacionActual.estado === 'enviada'"
+                class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <p class="text-sm font-semibold text-blue-700 mb-2">📋 Cotización enviada — esperando decisión del conductor</p>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <div><span class="text-gray-500">Monto:</span> <span class="font-semibold">Bs {{ cotizacionActual.monto_estimado }}</span></div>
+                  <div><span class="text-gray-500">Tiempo:</span> <span class="font-semibold">{{ cotizacionActual.tiempo_estimado }}</span></div>
+                  <div class="col-span-2"><span class="text-gray-500">Servicio:</span> <span class="font-semibold">{{ cotizacionActual.descripcion_servicio }}</span></div>
+                </div>
+              </div>
+
             </div>
-            <div class="flex gap-2">
-              <button (click)="enviarCotizacion()" [disabled]="enviandoCotizacion"
-                class="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-sm font-medium py-2.5 rounded-xl transition-all">
-                {{ enviandoCotizacion ? 'Enviando...' : 'Enviar cotización' }}
+            <!-- FIN ESTADO PENDIENTE -->
+
+            <!-- ESTADO: ASIGNADA -->
+            <div *ngIf="emergenciaSeleccionada.estado === 'asignada'" class="flex flex-col gap-3 pt-2">
+
+              <!-- Cotización aceptada -->
+              <div *ngIf="cotizacionActual && cotizacionActual.estado === 'aceptada'"
+                class="bg-green-50 border border-green-200 rounded-xl p-3">
+                <p class="text-sm font-semibold text-green-700">✅ Cotización aceptada por el conductor</p>
+              </div>
+
+              <!-- Cotización rechazada -->
+              <div *ngIf="cotizacionRechazada" class="bg-red-50 border border-red-200 rounded-xl p-3">
+                <p class="text-sm font-semibold text-red-700">❌ El conductor rechazó tu cotización</p>
+                <button (click)="cotizacionRechazada = false; abrirFormCotizacion()"
+                  class="mt-2 text-xs text-blue-600 underline">
+                  Enviar nueva cotización
+                </button>
+              </div>
+
+              <!-- Selector de técnico -->
+              <div *ngIf="!cotizacionActual || cotizacionActual.estado === 'aceptada'"
+                class="flex flex-col gap-3">
+                <select [(ngModel)]="idTecnicoSeleccionado"
+                  class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <option [ngValue]="null">Seleccionar técnico</option>
+                  <option *ngFor="let t of tecnicos" [value]="t.id_tecnico">
+                    {{ t.nombre }} — {{ t.especialidad }}
+                  </option>
+                </select>
+                <button (click)="asignarTecnico()" [disabled]="!idTecnicoSeleccionado"
+                  class="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium py-2.5 rounded-xl transition-all">
+                  Asignar técnico
+                </button>
+              </div>
+
+            </div>
+            <!-- FIN ESTADO ASIGNADA -->
+
+            <!-- ESTADO: EN CAMINO -->
+            <div *ngIf="emergenciaSeleccionada.estado === 'en_camino'" class="pt-2">
+              <div class="bg-blue-50 border border-blue-200 rounded-xl p-3">
+                <p class="text-sm font-semibold text-blue-700">🚗 Técnico en camino</p>
+              </div>
+            </div>
+
+            <!-- ESTADO: ATENDIENDO -->
+            <div *ngIf="emergenciaSeleccionada.estado === 'atendiendo'" class="flex flex-col gap-3 pt-2">
+              <div class="bg-orange-50 border border-orange-200 rounded-xl p-4">
+                <p class="text-sm font-semibold text-orange-700 mb-3">🔧 Vehículo en atención</p>
+                <div *ngIf="emergenciaSeleccionada.tiempo_estimado_reparacion"
+                  class="bg-white rounded-xl p-3 mb-3 border border-orange-100">
+                  <p class="text-xs text-gray-500 mb-1">Tiempo estimado actual</p>
+                  <p class="text-sm font-semibold text-orange-700">⏱ {{ emergenciaSeleccionada.tiempo_estimado_reparacion }}</p>
+                </div>
+                <div class="flex gap-2">
+                  <input type="text" [(ngModel)]="tiempoEstimadoInput" placeholder="Ej: 45 min"
+                    class="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"/>
+                  <button (click)="actualizarTiempoEstimado()" [disabled]="!tiempoEstimadoInput || enviandoTiempo"
+                    class="bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all">
+                    {{ enviandoTiempo ? '...' : 'Guardar' }}
+                  </button>
+                </div>
+              </div>
+              <button (click)="finalizarEmergencia()"
+                class="w-full bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2.5 rounded-xl transition-all">
+                ✓ Marcar como finalizada
               </button>
-              <button (click)="mostrarFormCotizacion = false"
-                class="px-4 bg-gray-200 hover:bg-gray-300 text-gray-600 text-sm font-medium py-2.5 rounded-xl transition-all">
-                Cancelar
-              </button>
             </div>
+
+            <!-- ESTADO: CANCELADA -->
+            <div *ngIf="emergenciaSeleccionada.estado === 'cancelada'"
+              class="bg-red-50 border border-red-200 rounded-xl p-4">
+              <p class="text-sm font-semibold text-red-700 mb-2">🚫 Servicio cancelado por el conductor</p>
+              <div class="bg-white rounded-xl p-3 border border-red-100">
+                <p class="text-xs text-gray-500 mb-1">Recargo por cancelación aplicado</p>
+                <p class="text-xl font-bold text-red-600">Bs 70</p>
+              </div>
+            </div>
+
           </div>
         </div>
-
-        <div *ngIf="cotizacionActual && cotizacionActual.estado === 'enviada'"
-          class="bg-blue-50 border border-blue-200 rounded-xl p-4">
-          <p class="text-sm font-semibold text-blue-700 mb-2">📋 Cotización enviada — esperando decisión</p>
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <div><span class="text-gray-500">Monto:</span> <span class="font-semibold">Bs {{ cotizacionActual.monto_estimado }}</span></div>
-            <div><span class="text-gray-500">Tiempo:</span> <span class="font-semibold">{{ cotizacionActual.tiempo_estimado }}</span></div>
-            <div class="col-span-2"><span class="text-gray-500">Servicio:</span> <span class="font-semibold">{{ cotizacionActual.descripcion_servicio }}</span></div>
-          </div>
-        </div>
-
-        <div *ngIf="cotizacionActual && cotizacionActual.estado === 'aceptada'"
-          class="bg-green-50 border border-green-200 rounded-xl p-3">
-          <p class="text-sm font-semibold text-green-700">✅ Cotización aceptada por el conductor</p>
-        </div>
-
-        <div *ngIf="!cotizacionActual && cotizacionRechazada"
-          class="bg-red-50 border border-red-200 rounded-xl p-3">
-          <p class="text-sm font-semibold text-red-700">❌ El conductor rechazó tu cotización</p>
-          <button (click)="cotizacionRechazada = false; abrirFormCotizacion()"
-            class="mt-2 text-xs text-blue-600 underline">
-            Enviar nueva cotización
-          </button>
-        </div>
-
-        <div *ngIf="(cotizacionActual && cotizacionActual.estado === 'aceptada') ||
-                    (!cotizacionActual && emergenciaSeleccionada.estado === 'asignada')"
-          class="flex flex-col gap-3">
-          <select [(ngModel)]="idTecnicoSeleccionado"
-            class="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option [ngValue]="null">Seleccionar técnico</option>
-            <option *ngFor="let t of tecnicos" [value]="t.id_tecnico">
-              {{ t.nombre }} — {{ t.especialidad }}
-            </option>
-          </select>
-          <button (click)="asignarTecnico()" [disabled]="!idTecnicoSeleccionado"
-            class="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium py-2.5 rounded-xl transition-all">
-            Asignar técnico
-          </button>
-        </div>
       </div>
-
-      <!-- Técnico en camino -->
-      <div *ngIf="emergenciaSeleccionada.estado === 'en_camino'" class="pt-2">
-        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3">
-          <p class="text-sm font-semibold text-blue-700">🚗 Técnico en camino</p>
-        </div>
-      </div>
-
-      <!-- Atendiendo -->
-      <div *ngIf="emergenciaSeleccionada.estado === 'atendiendo'" class="flex flex-col gap-3 pt-2">
-        <div class="bg-orange-50 border border-orange-200 rounded-xl p-4">
-          <p class="text-sm font-semibold text-orange-700 mb-3">🔧 Vehículo en atención</p>
-          <div *ngIf="emergenciaSeleccionada.tiempo_estimado_reparacion"
-            class="bg-white rounded-xl p-3 mb-3 border border-orange-100">
-            <p class="text-xs text-gray-500 mb-1">Tiempo estimado actual</p>
-            <p class="text-sm font-semibold text-orange-700">⏱ {{ emergenciaSeleccionada.tiempo_estimado_reparacion }}</p>
-          </div>
-          <div class="flex gap-2">
-            <input type="text" [(ngModel)]="tiempoEstimadoInput" placeholder="Ej: 45 min"
-              class="flex-1 border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"/>
-            <button (click)="actualizarTiempoEstimado()" [disabled]="!tiempoEstimadoInput || enviandoTiempo"
-              class="bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all">
-              {{ enviandoTiempo ? '...' : 'Guardar' }}
-            </button>
-          </div>
-        </div>
-        <button (click)="finalizarEmergencia()"
-          class="w-full bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2.5 rounded-xl transition-all">
-          ✓ Marcar como finalizada
-        </button>
-      </div>
-
-      <!-- Cancelada -->
-      <div *ngIf="emergenciaSeleccionada.estado === 'cancelada'"
-        class="bg-red-50 border border-red-200 rounded-xl p-4">
-        <p class="text-sm font-semibold text-red-700 mb-2">🚫 Servicio cancelado por el conductor</p>
-        <div class="bg-white rounded-xl p-3 border border-red-100">
-          <p class="text-xs text-gray-500 mb-1">Recargo por cancelación aplicado</p>
-          <p class="text-xl font-bold text-red-600">Bs 70</p>
-        </div>
-      </div>
+      <!-- FIN Modal -->
 
     </div>
   </div>
-  </div>
-</div>
 </div>

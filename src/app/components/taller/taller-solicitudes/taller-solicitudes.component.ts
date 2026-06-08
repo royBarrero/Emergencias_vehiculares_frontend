@@ -13,7 +13,9 @@ import { Subscription } from 'rxjs';
 })
 export class TallerSolicitudesComponent implements OnInit, OnDestroy {
   taller: any;
+  // Pendientes = emergencias asignadas a este taller con estado 'pendiente'
   emergenciasPendientes: any[] = [];
+  // Activas = emergencias con estado asignada/en_camino/atendiendo/finalizada
   emergenciasTaller: any[] = [];
   emergenciaSeleccionada: any = null;
   tecnicos: any[] = [];
@@ -23,13 +25,13 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
   private wsSubscriptions: Map<number, Subscription> = new Map();
   private wsTallerSub: Subscription | null = null;
 
-  // Cotización
   cotizacionActual: any = null;
   mostrarFormCotizacion: boolean = false;
   enviandoCotizacion: boolean = false;
   tiempoEstimadoInput: string = '';
   enviandoTiempo: boolean = false;
   cotizacionRechazada: boolean = false;
+  mostrarModal: boolean = false;
   formCotizacion = {
     monto_estimado: null as number | null,
     descripcion_servicio: '',
@@ -69,10 +71,10 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.wsSubscriptions.forEach((sub, id) => {
-      if (this.wsTallerSub) this.wsTallerSub.unsubscribe();
       sub.unsubscribe();
       this.api.desconectarEmergenciaWS(id);
     });
+    if (this.wsTallerSub) this.wsTallerSub.unsubscribe();
   }
 
   conectarWS(id_emergencia: number) {
@@ -80,7 +82,6 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
     const sub = this.api.conectarEmergenciaWS(id_emergencia).subscribe({
       next: (msg: any) => {
         this.ngZone.run(() => {
-          console.log('WS mensaje:', msg);
           if (msg.tipo === 'cambio_estado') {
             this.actualizarEmergenciaLocal(msg);
           }
@@ -93,70 +94,79 @@ export class TallerSolicitudesComponent implements OnInit, OnDestroy {
     });
     this.wsSubscriptions.set(id_emergencia, sub);
   }
+
   conectarWSTaller() {
-    this.wsTallerSub = this.api.conectarTallerWS(this.taller.id_taller).subscribe({
-      next: (msg: any) => {
-  this.ngZone.run(() => {
-    if (msg.tipo === 'nueva_emergencia' || msg.tipo === 'cambio_estado') {
-      this.cargarEmergencias();
+  this.wsTallerSub = this.api.conectarTallerWS(this.taller.id_taller).subscribe({
+    next: (msg: any) => {
+      this.ngZone.run(() => {
+
+        if (msg.tipo === 'nueva_emergencia') {
+          this.cargarEmergencias();
+        }
+
+        if (msg.tipo === 'cambio_estado') {
+          this.cargarEmergencias();
+          if (msg.estado === 'asignada' && this.emergenciaSeleccionada?.id_emergencia === msg.id_emergencia) {
+            this.emergenciaSeleccionada = { ...this.emergenciaSeleccionada, estado: 'asignada' };
+            this.cargarCotizacion(msg.id_emergencia);
+          }
+        }
+
+        if (msg.tipo === 'nueva_cotizacion') {
+          if (this.emergenciaSeleccionada?.id_emergencia === msg.id_emergencia) {
+            this.cargarCotizacion(msg.id_emergencia);
+          }
+          this.cargarEmergencias();
+        }
+
+        this.cdr.detectChanges();
+      });
+    },
+    error: () => {
+      setTimeout(() => this.conectarWSTaller(), 3000);
     }
-    if (msg.tipo === 'nueva_cotizacion') {
-  if (this.emergenciaSeleccionada?.id_emergencia === msg.id_emergencia) {
-    this.cargarCotizacion(msg.id_emergencia);
-  }
-  this.cargarEmergencias();
-}
-if (msg.tipo === 'decision_cotizacion') {
-  if (this.emergenciaSeleccionada?.id_emergencia === msg.id_emergencia) {
-    if (msg.estado === 'rechazada') {
-      this.cotizacionActual = null;
-      this.cotizacionRechazada = true;
-    } else {
-      this.cargarCotizacion(msg.id_emergencia);
-    }
-  }
-  this.cargarEmergencias();
-}
-    this.cdr.detectChanges();
   });
-},
-      error: () => {
-        setTimeout(() => this.conectarWSTaller(), 3000);
-      }
-    });
-  }
+}
+
   actualizarEmergenciaLocal(msg: any) {
-    // Actualizar en lista de emergencias del taller
-    const idx = this.emergenciasTaller.findIndex(e => e.id_emergencia === msg.id_emergencia);
-    if (idx !== -1) {
-      this.emergenciasTaller[idx].estado = msg.estado;
-    }
-    // Actualizar detalle si está abierto
-    if (this.emergenciaSeleccionada?.id_emergencia === msg.id_emergencia) {
-      this.emergenciaSeleccionada.estado = msg.estado;
-    }
-    // Si la emergencia finalizó o canceló, desconectar WS
-    if (['finalizada', 'cancelada'].includes(msg.estado)) {
-      const sub = this.wsSubscriptions.get(msg.id_emergencia);
-      if (sub) sub.unsubscribe();
-      this.wsSubscriptions.delete(msg.id_emergencia);
-      this.api.desconectarEmergenciaWS(msg.id_emergencia);
+  const idxTaller = this.emergenciasTaller.findIndex(e => e.id_emergencia === msg.id_emergencia);
+  if (idxTaller !== -1) {
+    this.emergenciasTaller[idxTaller].estado = msg.estado;
+  }
+
+  const idxPendiente = this.emergenciasPendientes.findIndex(e => e.id_emergencia === msg.id_emergencia);
+  if (idxPendiente !== -1 && msg.estado !== 'pendiente') {
+    this.emergenciasPendientes.splice(idxPendiente, 1);
+    this.cargarEmergencias();
+  }
+
+  // Actualizar detalle si está abierto
+  if (this.emergenciaSeleccionada?.id_emergencia === msg.id_emergencia) {
+    this.emergenciaSeleccionada = { ...this.emergenciaSeleccionada, estado: msg.estado };
+    // Si pasó a asignada recargar para mover de pendientes a mis emergencias
+    if (msg.estado === 'asignada') {
+      this.cargarEmergencias();
     }
   }
 
+  if (['finalizada', 'cancelada'].includes(msg.estado)) {
+    const sub = this.wsSubscriptions.get(msg.id_emergencia);
+    if (sub) sub.unsubscribe();
+    this.wsSubscriptions.delete(msg.id_emergencia);
+    this.api.desconectarEmergenciaWS(msg.id_emergencia);
+  }
+}
+
   cargarEmergencias() {
-    this.api.obtenerEmergenciasPendientes().subscribe({
-      next: (data: any) => {
-        this.ngZone.run(() => {
-          this.emergenciasPendientes = data;
-          this.cdr.detectChanges();
-        });
-      }
-    });
+    // Solo emergencias de ESTE taller
     this.api.obtenerEmergenciasTaller(this.taller.id_taller).subscribe({
       next: (data: any) => {
         this.ngZone.run(() => {
-          this.emergenciasTaller = data;
+          // Separar pendientes (nuevas solicitudes) de activas
+          this.emergenciasPendientes = data.filter((e: any) => e.estado === 'pendiente');
+          this.emergenciasTaller = data.filter((e: any) => 
+            ['asignada', 'en_camino', 'atendiendo', 'finalizada', 'cancelada'].includes(e.estado)
+          );
           // Conectar WS a emergencias activas
           data.forEach((e: any) => {
             if (!['finalizada', 'cancelada'].includes(e.estado)) {
@@ -188,8 +198,10 @@ if (msg.tipo === 'decision_cotizacion') {
           this.idTecnicoSeleccionado = null;
           this.cotizacionActual = null;
           this.mostrarFormCotizacion = false;
+          this.cotizacionRechazada = false;
           this.cargarCotizacion(data.id_emergencia);
           this.conectarWS(data.id_emergencia);
+          this.mostrarModal = true;
           this.cdr.detectChanges();
         });
       }
@@ -201,10 +213,15 @@ if (msg.tipo === 'decision_cotizacion') {
       next: (data: any) => {
         this.ngZone.run(() => {
           this.cotizacionActual = data;
+          if (data?.estado === 'rechazada') {
+            this.cotizacionRechazada = true;
+            this.cotizacionActual = null;
+          }
           this.cdr.detectChanges();
         });
       },
       error: () => {
+        // No hay cotización aún, está bien
         this.cotizacionActual = null;
       }
     });
@@ -220,55 +237,35 @@ if (msg.tipo === 'decision_cotizacion') {
     this.mostrarFormCotizacion = true;
   }
 
-  enviarCotizacion() {
-    if (!this.cotizacionActual || !this.formCotizacion.monto_estimado ||
-      !this.formCotizacion.descripcion_servicio || !this.formCotizacion.tiempo_estimado) return;
-    this.enviandoCotizacion = true;
-    this.api.responderCotizacion(this.cotizacionActual.id_cotizacion, this.formCotizacion).subscribe({
-      next: (data: any) => {
-        this.ngZone.run(() => {
-          this.cotizacionActual = data;
-          this.mostrarFormCotizacion = false;
-          this.enviandoCotizacion = false;
-          this.cdr.detectChanges();
-        });
-      },
-      error: () => {
-        this.enviandoCotizacion = false;
-      }
-    });
-  }
+ crearYEnviarCotizacion() {
+  if (!this.emergenciaSeleccionada || !this.formCotizacion.monto_estimado ||
+    !this.formCotizacion.descripcion_servicio || !this.formCotizacion.tiempo_estimado) return;
+  
+  this.enviandoCotizacion = true;
 
-  aceptarEmergencia() {
-    if (!this.emergenciaSeleccionada) return;
-    this.api.actualizarEstadoEmergencia(this.emergenciaSeleccionada.id_emergencia, {
-      estado: 'asignada',
-      id_taller: this.taller.id_taller
-    }).subscribe({
-      next: () => {
-        this.ngZone.run(() => {
-          this.emergenciaSeleccionada.estado = 'asignada';
-          this.cargarEmergencias();
-          this.cdr.detectChanges();
-        });
-      }
-    });
-  }
-
-  rechazarEmergencia() {
-    if (!this.emergenciaSeleccionada) return;
-    this.api.actualizarEstadoEmergencia(this.emergenciaSeleccionada.id_emergencia, {
-      estado: 'cancelada'
-    }).subscribe({
-      next: () => {
-        this.ngZone.run(() => {
-          this.emergenciaSeleccionada = null;
-          this.cargarEmergencias();
-          this.cdr.detectChanges();
-        });
-      }
-    });
-  }
+  // Paso 1 — crear la cotización
+  this.api.crearCotizacion(
+    this.emergenciaSeleccionada.id_emergencia,
+    this.taller.id_taller,
+    {}
+  ).subscribe({
+    next: (cotizacion: any) => {
+      // Paso 2 — responderla con los datos del form
+      this.api.responderCotizacion(cotizacion.id_cotizacion, this.formCotizacion).subscribe({
+        next: (data: any) => {
+          this.ngZone.run(() => {
+            this.cotizacionActual = data;
+            this.mostrarFormCotizacion = false;
+            this.enviandoCotizacion = false;
+            this.cdr.detectChanges();
+          });
+        },
+        error: () => { this.enviandoCotizacion = false; }
+      });
+    },
+    error: () => { this.enviandoCotizacion = false; }
+  });
+}
 
   asignarTecnico() {
     if (!this.emergenciaSeleccionada || !this.idTecnicoSeleccionado) return;
@@ -291,6 +288,40 @@ if (msg.tipo === 'decision_cotizacion') {
     this.cotizacionActual = null;
     this.mostrarFormCotizacion = false;
     this.cotizacionRechazada = false;
+    this.mostrarModal = false;
+  }
+
+  actualizarTiempoEstimado() {
+    if (!this.emergenciaSeleccionada || !this.tiempoEstimadoInput) return;
+    this.enviandoTiempo = true;
+    this.api.actualizarEstadoEmergencia(this.emergenciaSeleccionada.id_emergencia, {
+      tiempo_estimado_reparacion: this.tiempoEstimadoInput
+    }).subscribe({
+      next: () => {
+        this.ngZone.run(() => {
+          this.emergenciaSeleccionada.tiempo_estimado_reparacion = this.tiempoEstimadoInput;
+          this.tiempoEstimadoInput = '';
+          this.enviandoTiempo = false;
+          this.cdr.detectChanges();
+        });
+      },
+      error: () => { this.enviandoTiempo = false; }
+    });
+  }
+
+  finalizarEmergencia() {
+    if (!this.emergenciaSeleccionada) return;
+    this.api.actualizarEstadoEmergencia(this.emergenciaSeleccionada.id_emergencia, {
+      estado: 'finalizada'
+    }).subscribe({
+      next: () => {
+        this.ngZone.run(() => {
+          this.emergenciaSeleccionada.estado = 'finalizada';
+          this.cargarEmergencias();
+          this.cdr.detectChanges();
+        });
+      }
+    });
   }
 
   getColorPrioridad(prioridad: string): string {
@@ -318,37 +349,5 @@ if (msg.tipo === 'decision_cotizacion') {
       rechazada: '#dc2626'
     };
     return colores[estado] || '#6b7280';
-  }
-  actualizarTiempoEstimado() {
-    if (!this.emergenciaSeleccionada || !this.tiempoEstimadoInput) return;
-    this.enviandoTiempo = true;
-    this.api.actualizarEstadoEmergencia(this.emergenciaSeleccionada.id_emergencia, {
-      tiempo_estimado_reparacion: this.tiempoEstimadoInput
-    }).subscribe({
-      next: (data: any) => {
-        this.ngZone.run(() => {
-          this.emergenciaSeleccionada.tiempo_estimado_reparacion = this.tiempoEstimadoInput;
-          this.tiempoEstimadoInput = '';
-          this.enviandoTiempo = false;
-          this.cdr.detectChanges();
-        });
-      },
-      error: () => { this.enviandoTiempo = false; }
-    });
-  }
-
-  finalizarEmergencia() {
-    if (!this.emergenciaSeleccionada) return;
-    this.api.actualizarEstadoEmergencia(this.emergenciaSeleccionada.id_emergencia, {
-      estado: 'finalizada'
-    }).subscribe({
-      next: () => {
-        this.ngZone.run(() => {
-          this.emergenciaSeleccionada.estado = 'finalizada';
-          this.cargarEmergencias();
-          this.cdr.detectChanges();
-        });
-      }
-    });
   }
 }

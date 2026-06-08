@@ -61,4 +61,5 @@ ngOnDestroy() {
     localStorage.removeItem('taller');
     this.router.navigate(['/login']);
   }
+  
 }
