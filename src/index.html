@@ -9,13 +9,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer=""></script>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
     await OneSignal.init({
       appId: "493ddf8d-88a4-4d8e-beb5-76bf838fcbe2",
       allowLocalhostAsSecureOrigin: true,
+      serviceWorkerPath: "/OneSignalSDKWorker.js",
+      serviceWorkerParam: { scope: "/push/onesignal/" },
     });
   });
 </script>
