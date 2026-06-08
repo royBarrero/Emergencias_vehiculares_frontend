@@ -8,7 +8,8 @@ import { Observable } from 'rxjs';
 })
 export class ApiService {
 
-  private apiUrl = 'https://backend-597509309669.us-central1.run.app';
+  //private apiUrl = 'https://backend-597509309669.us-central1.run.app';
+  private apiUrl = 'http://localhost:8000';
   private wsConnections: Map<number, WebSocket> = new Map();
   private wsTallerSocket: WebSocket | null = null;
 
@@ -301,7 +302,7 @@ export class ApiService {
   // WEBSOCKETS
   conectarEmergenciaWS(id_emergencia: number): Observable<any> {
     return new Observable(observer => {
-      const wsUrl = `wss://backend-597509309669.us-central1.run.app/ws/emergencia/${id_emergencia}`;
+      const wsUrl = `ws://localhost:8000/ws/emergencia/${id_emergencia}`;
       const ws = new WebSocket(wsUrl);
       this.wsConnections.set(id_emergencia, ws);
       ws.onmessage = (event) => {
@@ -329,7 +330,7 @@ export class ApiService {
 
   conectarTallerWS(id_taller: number): Observable<any> {
     return new Observable(observer => {
-      const wsUrl = `wss://backend-597509309669.us-central1.run.app/ws/taller/${id_taller}`;
+      const wsUrl = `ws://localhost:8000/ws/taller/${id_taller}`;
       const ws = new WebSocket(wsUrl);
       this.wsTallerSocket = ws;
       ws.onmessage = (event) => {
